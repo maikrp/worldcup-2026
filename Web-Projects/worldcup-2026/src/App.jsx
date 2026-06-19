@@ -61,6 +61,87 @@ const mockGroups = [
       { code: "gb-eng", team_name: "Inglaterra", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 3, goals_against: 3, goal_difference: 0, points: 4 },
       { code: "it", team_name: "Italia", played: 3, wins: 0, draws: 0, losses: 3, goals_for: 1, goals_against: 7, goal_difference: -6, points: 0 }
     ]
+  },
+  {
+    name: "D",
+    standings: [
+      { code: "pt", team_name: "Portugal", played: 3, wins: 2, draws: 1, losses: 0, goals_for: 5, goals_against: 2, goal_difference: 3, points: 7 },
+      { code: "nl", team_name: "Países Bajos", played: 3, wins: 2, draws: 0, losses: 1, goals_for: 6, goals_against: 4, goal_difference: 2, points: 6 },
+      { code: "ma", team_name: "Marruecos", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 3, goals_against: 3, goal_difference: 0, points: 4 },
+      { code: "nz", team_name: "Nueva Zelanda", played: 3, wins: 0, draws: 0, losses: 3, goals_for: 1, goals_against: 6, goal_difference: -5, points: 0 }
+    ]
+  },
+  {
+    name: "E",
+    standings: [
+      { code: "be", team_name: "Bélgica", played: 3, wins: 2, draws: 0, losses: 1, goals_for: 4, goals_against: 2, goal_difference: 2, points: 6 },
+      { code: "jp", team_name: "Japón", played: 3, wins: 2, draws: 0, losses: 1, goals_for: 5, goals_against: 4, goal_difference: 1, points: 6 },
+      { code: "cl", team_name: "Chile", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 3, goals_against: 3, goal_difference: 0, points: 4 },
+      { code: "sn", team_name: "Senegal", played: 3, wins: 0, draws: 1, losses: 2, goals_for: 2, goals_against: 5, goal_difference: -3, points: 1 }
+    ]
+  },
+  {
+    name: "F",
+    standings: [
+      { code: "hr", team_name: "Croacia", played: 3, wins: 2, draws: 1, losses: 0, goals_for: 4, goals_against: 1, goal_difference: 3, points: 7 },
+      { code: "dk", team_name: "Dinamarca", played: 3, wins: 1, draws: 2, losses: 0, goals_for: 3, goals_against: 2, goal_difference: 1, points: 5 },
+      { code: "tn", team_name: "Túnez", played: 3, wins: 1, draws: 0, losses: 2, goals_for: 2, goals_against: 4, goal_difference: -2, points: 3 },
+      { code: "ca", team_name: "Camerún", played: 3, wins: 0, draws: 1, losses: 2, goals_for: 1, goals_against: 3, goal_difference: -2, points: 1 }
+    ]
+  },
+  {
+    name: "G",
+    standings: [
+      { code: "ch", team_name: "Suiza", played: 3, wins: 2, draws: 1, losses: 0, goals_for: 5, goals_against: 2, goal_difference: 3, points: 7 },
+      { code: "kr", team_name: "Corea del Sur", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 4, goals_against: 4, goal_difference: 0, points: 4 },
+      { code: "ec", team_name: "Ecuador", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 3, goals_against: 3, goal_difference: 0, points: 4 },
+      { code: "gh", team_name: "Ghana", played: 3, wins: 0, draws: 1, losses: 2, goals_for: 2, goals_against: 5, goal_difference: -3, points: 1 }
+    ]
+  },
+  {
+    name: "H",
+    standings: [
+      { code: "pl", team_name: "Polonia", played: 3, wins: 2, draws: 0, losses: 1, goals_for: 4, goals_against: 3, goal_difference: 1, points: 6 },
+      { code: "se", team_name: "Suecia", played: 3, wins: 1, draws: 2, losses: 0, goals_for: 3, goals_against: 2, goal_difference: 1, points: 5 },
+      { code: "pe", team_name: "Perú", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 2, goals_against: 2, goal_difference: 0, points: 4 },
+      { code: "dz", team_name: "Argelia", played: 3, wins: 0, draws: 1, losses: 2, goals_for: 1, goals_against: 3, goal_difference: -2, points: 1 }
+    ]
+  },
+  {
+    name: "I",
+    standings: [
+      { code: "ua", team_name: "Ucrania", played: 3, wins: 2, draws: 1, losses: 0, goals_for: 5, goals_against: 2, goal_difference: 3, points: 7 },
+      { code: "tr", team_name: "Turquía", played: 3, wins: 2, draws: 0, losses: 1, goals_for: 6, goals_against: 3, goal_difference: 3, points: 6 },
+      { code: "cr", team_name: "Costa Rica", played: 3, wins: 1, draws: 0, losses: 2, goals_for: 2, goals_against: 5, goal_difference: -3, points: 3 },
+      { code: "au", team_name: "Australia", played: 3, wins: 0, draws: 1, losses: 2, goals_for: 1, goals_against: 4, goal_difference: -3, points: 1 }
+    ]
+  },
+  {
+    name: "J",
+    standings: [
+      { code: "at", team_name: "Austria", played: 3, wins: 2, draws: 1, losses: 0, goals_for: 6, goals_against: 3, goal_difference: 3, points: 7 },
+      { code: "hu", team_name: "Hungría", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 3, goals_against: 3, goal_difference: 0, points: 4 },
+      { code: "ng", team_name: "Nigeria", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 4, goals_against: 5, goal_difference: -1, points: 4 },
+      { code: "sa", team_name: "Arabia Saudita", played: 3, wins: 0, draws: 1, losses: 2, goals_for: 2, goals_against: 4, goal_difference: -2, points: 1 }
+    ]
+  },
+  {
+    name: "K",
+    standings: [
+      { code: "cz", team_name: "República Checa", played: 3, wins: 2, draws: 0, losses: 1, goals_for: 4, goals_against: 2, goal_difference: 2, points: 6 },
+      { code: "eg", team_name: "Egipto", played: 3, wins: 1, draws: 2, losses: 0, goals_for: 3, goals_against: 2, goal_difference: 1, points: 5 },
+      { code: "ve", team_name: "Venezuela", played: 3, wins: 1, draws: 1, losses: 1, goals_for: 3, goals_against: 3, goal_difference: 0, points: 4 },
+      { code: "ir", team_name: "Irán", played: 3, wins: 0, draws: 1, losses: 2, goals_for: 1, goals_against: 4, goal_difference: -3, points: 1 }
+    ]
+  },
+  {
+    name: "L",
+    standings: [
+      { code: "no", team_name: "Noruega", played: 3, wins: 2, draws: 1, losses: 0, goals_for: 7, goals_against: 3, goal_difference: 4, points: 7 },
+      { code: "py", team_name: "Paraguay", played: 3, wins: 2, draws: 0, losses: 1, goals_for: 4, goals_against: 3, goal_difference: 1, points: 6 },
+      { code: "za", team_name: "Sudáfrica", played: 3, wins: 1, draws: 0, losses: 2, goals_for: 2, goals_against: 5, goal_difference: -3, points: 3 },
+      { code: "qa", team_name: "Catar", played: 3, wins: 0, draws: 1, losses: 2, goals_for: 2, goals_against: 4, goal_difference: -2, points: 1 }
+    ]
   }
 ];
 
