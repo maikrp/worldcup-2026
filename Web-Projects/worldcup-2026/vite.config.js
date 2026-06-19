@@ -18,12 +18,13 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: [
-        "apple-touch-icon.png",
+        "worldcup-apple-touch.png",
         "wc2026-logo.png",
         "hero-mascots.webp",
-        "social-preview.jpg",
+        "worldcup-share-v3.jpg",
       ],
       manifest: {
+        id: "/fifa-worldcup-2026-v3",
         name: "Mundial 2026 Dashboard",
         short_name: "Mundial 2026",
         description:
@@ -38,17 +39,17 @@ export default defineConfig({
         categories: ["sports", "news", "entertainment"],
         icons: [
           {
-            src: "/pwa-192x192.png",
+            src: "/worldcup-icon-192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/worldcup-icon-512.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "/pwa-maskable-512x512.png",
+            src: "/worldcup-maskable-512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
