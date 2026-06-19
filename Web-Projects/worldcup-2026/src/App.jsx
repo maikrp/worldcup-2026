@@ -16,24 +16,22 @@ import {
 } from "lucide-react";
 import "./App.css";
 
-const API_URL = import.meta.env.VITE_WC_API_URL || "https://worldcup26.ir/api";
-
 const flagUrl = (code) =>
   code ? `https://flagcdn.com/w40/${code.toLowerCase()}.png` : "";
 
 const mockTeams = [
-  { code: "US", name: "Estados Unidos", points: 6, wins: 2, goal_difference: 4, goals_for: 5, played: 2 },
-  { code: "MX", name: "México", points: 4, wins: 1, goal_difference: 1, goals_for: 3, played: 2 },
-  { code: "CA", name: "Canadá", points: 1, wins: 0, goal_difference: -2, goals_for: 1, played: 2 },
-  { code: "AR", name: "Argentina", points: 6, wins: 2, goal_difference: 5, goals_for: 6, played: 2 },
-  { code: "BR", name: "Brasil", points: 6, wins: 2, goal_difference: 3, goals_for: 4, played: 2 },
-  { code: "FR", name: "Francia", points: 4, wins: 1, goal_difference: 2, goals_for: 3, played: 2 },
-  { code: "ES", name: "España", points: 6, wins: 2, goal_difference: 4, goals_for: 5, played: 2 },
-  { code: "DE", name: "Alemania", points: 3, wins: 1, goal_difference: 0, goals_for: 2, played: 2 },
-  { code: "IT", name: "Italia", points: 3, wins: 1, goal_difference: -1, goals_for: 2, played: 2 },
-  { code: "GB-ENG", name: "Inglaterra", points: 4, wins: 1, goal_difference: 1, goals_for: 2, played: 2 },
-  { code: "UY", name: "Uruguay", points: 4, wins: 1, goal_difference: 2, goals_for: 4, played: 2 },
-  { code: "CO", name: "Colombia", points: 3, wins: 1, goal_difference: 0, goals_for: 2, played: 2 },
+  { code: "us", name: "Estados Unidos", points: 6, wins: 2, goal_difference: 4, goals_for: 5, played: 2 },
+  { code: "mx", name: "México", points: 4, wins: 1, goal_difference: 1, goals_for: 3, played: 2 },
+  { code: "ca", name: "Canadá", points: 1, wins: 0, goal_difference: -2, goals_for: 1, played: 2 },
+  { code: "ar", name: "Argentina", points: 6, wins: 2, goal_difference: 5, goals_for: 6, played: 2 },
+  { code: "br", name: "Brasil", points: 6, wins: 2, goal_difference: 3, goals_for: 4, played: 2 },
+  { code: "fr", name: "Francia", points: 4, wins: 1, goal_difference: 2, goals_for: 3, played: 2 },
+  { code: "es", name: "España", points: 6, wins: 2, goal_difference: 4, goals_for: 5, played: 2 },
+  { code: "de", name: "Alemania", points: 3, wins: 1, goal_difference: 0, goals_for: 2, played: 2 },
+  { code: "it", name: "Italia", points: 3, wins: 1, goal_difference: -1, goals_for: 2, played: 2 },
+  { code: "gb-eng", name: "Inglaterra", points: 4, wins: 1, goal_difference: 1, goals_for: 2, played: 2 },
+  { code: "uy", name: "Uruguay", points: 4, wins: 1, goal_difference: 2, goals_for: 4, played: 2 },
+  { code: "co", name: "Colombia", points: 3, wins: 1, goal_difference: 0, goals_for: 2, played: 2 },
 ];
 
 const mockGroups = [
@@ -77,23 +75,6 @@ const mockMatches = [
   { id: 8, home_team: "Francia", away_team: "España", home_score: null, away_score: null, kickoff_utc: "2026-06-26T18:00:00Z", status: "scheduled", phase: "Octavos de Final", stadium: "SoFi Stadium", round: "Octavos" },
 ];
 
-async function apiGet(path) {
-  // Support both custom standard endpoints and API mappings
-  try {
-    const res = await fetch(`${API_URL}${path}`);
-    if (!res.ok) throw new Error("Error fetching API");
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.warn("API direct request failed, using mock data:", error);
-    // Graceful offline mock fallback
-    if (path === "/matches") return mockMatches;
-    if (path === "/groups") return mockGroups;
-    if (path === "/teams") return mockTeams;
-    throw error;
-  }
-}
-
 function predictMatch(home, away) {
   const homePower =
     (home?.points || 0) * 3 +
@@ -124,38 +105,11 @@ function predictMatch(home, away) {
 }
 
 export default function App() {
-  const [matches, setMatches] = useState([]);
-  const [groups, setGroups] = useState([]);
+  const [matches, setMatches] = useState(mockMatches);
+  const [groups, setGroups] = useState(mockGroups);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [loading, setLoading] = useState(true);
-  const [usingMock, setUsingMock] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    setLoading(true);
-    try {
-      // worldcup26.ir matches/groups fetch logic
-      const [matchesData, groupsData] = await Promise.all([
-        apiGet("/matches"),
-        apiGet("/groups"),
-      ]);
-
-      setMatches(matchesData || mockMatches);
-      setGroups(groupsData || mockGroups);
-      setUsingMock(false);
-    } catch (error) {
-      console.warn("Falling back to demo mode:", error);
-      setMatches(mockMatches);
-      setGroups(mockGroups);
-      setUsingMock(true);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const nextMatches = matches
     .filter((m) => m.status === "scheduled" || m.phase?.toLowerCase().includes("grupo") || m.status === "PRE")
@@ -185,14 +139,7 @@ export default function App() {
         </div>
         
         <div className="api-badge-container">
-          {usingMock ? (
-            <span className="api-badge mock">Modo Offline (Demostración)</span>
-          ) : (
-            <span className="api-badge live">API worldcup26.ir Conectada</span>
-          )}
-          <button className="refresh-btn" onClick={loadData} title="Recargar datos">
-            <RefreshCw size={16} />
-          </button>
+          <span className="api-badge mock">Modo Local (Datos Internos)</span>
         </div>
       </header>
 
