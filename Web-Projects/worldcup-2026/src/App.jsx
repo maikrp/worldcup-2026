@@ -181,7 +181,7 @@ export default function App() {
           className={activeTab === "bracket" ? "active" : ""}
           onClick={() => setActiveTab("bracket")}
         >
-          <GitBranch size={18} /> Llaves (Bracket)
+          <GitBranch size={18} /> Llaves
         </button>
         <button
           className={activeTab === "predictions" ? "active" : ""}
