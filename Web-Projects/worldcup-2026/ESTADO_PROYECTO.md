@@ -35,6 +35,11 @@ El proyecto está activo y compila correctamente para producción. Es una SPA co
 - Salida principal: JavaScript gzip aproximado de 55 KB y CSS gzip aproximado de 4 KB.
 - La importación de los nuevos módulos quedó validada por el build.
 - Se verificó la existencia de `C:\Python\Toolbox\ebs_audit_master.py`.
+- PWA instalable con manifest, service worker, caché offline e iconos propios.
+- Metadatos Open Graph y Twitter configurados con imagen social 1200 × 630.
+- Formato oficial confirmado: 48 selecciones, 12 grupos, 104 partidos y ronda de 32.
+- Resultados, goleadores y bracket local se identifican expresamente como datos no oficiales o
+  simulaciones cuando no existe conexión directa con FIFA.
 
 ## Pendientes recomendados
 

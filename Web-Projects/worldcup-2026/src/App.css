@@ -38,12 +38,14 @@ body {
 .header {
   background:
     linear-gradient(
-      135deg,
-      rgba(11, 15, 25, 0.82) 0%,
-      rgba(19, 27, 46, 0.75) 50%,
-      rgba(11, 15, 25, 0.88) 100%
+      90deg,
+      rgba(11, 15, 25, 0.78) 0%,
+      rgba(11, 15, 25, 0.3) 38%,
+      rgba(11, 15, 25, 0.28) 62%,
+      rgba(11, 15, 25, 0.76) 100%
     ),
-    url("/header-bg.webp") center center / cover no-repeat;
+    url("/hero-mascots.webp") center center / cover no-repeat;
+  background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   padding: 20px 32px;
   border-radius: 20px;
@@ -610,6 +612,161 @@ td {
   color: var(--color-danger);
 }
 
+/* ======================== GOLEADORES ======================== */
+.scorers-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.scorers-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.scorers-heading h2 {
+  margin: 8px 0;
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.scorers-heading p,
+.scorers-note {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.scorers-kicker,
+.data-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.data-source-badge {
+  flex-shrink: 0;
+  padding: 9px 13px;
+  color: var(--color-secondary);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 999px;
+}
+
+.scorers-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-lg);
+}
+
+.scorers-table {
+  width: 100%;
+  min-width: 850px;
+}
+
+.scorers-table th {
+  padding: 14px 18px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.55px;
+}
+
+.scorers-table td {
+  padding: 14px 18px;
+}
+
+.scorers-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.scorers-table tbody tr:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.golden-boot-row {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent);
+}
+
+.scorer-position {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  font-weight: 800;
+}
+
+.position-1 {
+  color: #1a1200;
+  background: linear-gradient(135deg, #fcd34d, #f59e0b);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.3);
+}
+
+.scorer-player,
+.scorer-team,
+.minutes-cell,
+.goals-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.scorer-photo {
+  width: 54px;
+  height: 54px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.scorer-player strong,
+.scorer-player small {
+  display: block;
+}
+
+.scorer-player small {
+  margin-top: 4px;
+  color: var(--color-accent);
+  font-size: 11px;
+}
+
+.goals-pill {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 58px;
+  padding: 7px 12px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-primary), #2563eb);
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.minutes-cell {
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.scorers-note {
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .scorers-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 /* ======================== BRACKET ======================== */
 .bracket-container {
   display: flex;
@@ -924,6 +1081,58 @@ td {
   align-items: center;
   gap: 8px;
   font-size: 13px;
+}
+
+.prediction-model-info,
+.prediction-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.prediction-disclaimer {
+  color: var(--text-secondary);
+  font-size: 10px;
+  line-height: 1.4;
+  opacity: 0.82;
+}
+
+.prediction-source {
+  justify-content: flex-start;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  font-size: 11px;
+}
+
+.confidence {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.confidence-baja {
+  color: var(--color-accent);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.confidence-media {
+  color: var(--color-primary);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.confidence-alta {
+  color: var(--color-secondary);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+@media (max-width: 640px) {
+  .prediction-model-info {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 .verdict-icon {

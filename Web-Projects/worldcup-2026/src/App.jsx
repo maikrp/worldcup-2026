@@ -8,6 +8,7 @@ import {
   Award,
   GitBranch,
   Percent,
+  Goal,
 } from "lucide-react";
 import "./App.css";
 
@@ -18,14 +19,17 @@ import GroupTables from "./components/GroupTables";
 import Bracket from "./components/Bracket";
 import PredictionList from "./components/PredictionList";
 import DailyMatchSection from "./components/DailyMatchSection";
+import TopScorers from "./components/TopScorers";
 
 // Constants & Data
 import { mockGroups, mockMatches } from "./constants/mockData";
 import { flagUrl } from "./constants/teamCodes";
+import { topScorers } from "./constants/topScorers";
+import { normalizeMatchStatuses } from "./utils/matchStatus";
 import { calculateStandings } from "./utils/standings";
 
 export default function App() {
-  const matches = mockMatches;
+  const matches = normalizeMatchStatuses(mockMatches);
   const groups = calculateStandings(mockGroups, matches);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading] = useState(false);
@@ -33,6 +37,22 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState("2026-06-19");
   const [sortOrder, setSortOrder] = useState("asc");
   const [matchDateFilter, setMatchDateFilter] = useState("");
+  const [currentTime] = useState(() => Date.now());
+
+  const liveMatch = matches.find((match) => match.status === "live");
+  const nextMatch = matches
+    .filter(
+      (match) => match.status === "scheduled" && new Date(match.kickoff_utc).getTime() > currentTime
+    )
+    .sort((a, b) => new Date(a.kickoff_utc) - new Date(b.kickoff_utc))[0];
+
+  const nextMatchTime = nextMatch
+    ? new Intl.DateTimeFormat("es-CR", {
+        timeZone: "America/Costa_Rica",
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(new Date(nextMatch.kickoff_utc))
+    : null;
 
   const handlePrevDay = () => {
     const current = new Date(selectedDate + "T00:00:00");
@@ -93,12 +113,12 @@ export default function App() {
           </div>
           <div>
             <h1>Mundial 2026</h1>
-            <p>Dashboard de Predicciones, Grupos y Partidos</p>
+            <p>Dashboard no oficial · Predicciones, grupos y partidos</p>
           </div>
         </div>
 
         <div className="api-badge-container">
-          <span className="api-badge mock">Modo Local (Datos Internos)</span>
+          <span className="api-badge mock">Datos locales · No oficial</span>
         </div>
       </header>
 
@@ -133,6 +153,12 @@ export default function App() {
         >
           <Percent size={18} /> Predicciones
         </button>
+        <button
+          className={activeTab === "scorers" ? "active" : ""}
+          onClick={() => setActiveTab("scorers")}
+        >
+          <Goal size={18} /> Goleadores
+        </button>
       </nav>
 
       {loading ? (
@@ -159,21 +185,20 @@ export default function App() {
                 />
                 <StatCard
                   icon={<Flame className="text-accent" />}
-                  title={
-                    matches.some((m) => m.status === "live")
-                      ? "🔴 En Vivo Ahora"
-                      : "Próximo Partido"
-                  }
+                  title={liveMatch ? "🔴 En Vivo Ahora" : "Próximo Partido"}
                   value={
-                    matches.find((m) => m.status === "live")?.home_team?.split(" ")[0] +
-                      " vs " +
-                      matches.find((m) => m.status === "live")?.away_team?.split(" ")[0] ||
-                    "Programado"
+                    liveMatch
+                      ? `${liveMatch.home_team} vs ${liveMatch.away_team}`
+                      : nextMatch
+                        ? `${nextMatch.home_team} vs ${nextMatch.away_team}`
+                        : "Jornada finalizada"
                   }
                   sub={
-                    matches.some((m) => m.status === "live")
-                      ? `${matches.find((m) => m.status === "live")?.home_score} - ${matches.find((m) => m.status === "live")?.away_score}`
-                      : "Ver calendario"
+                    liveMatch
+                      ? `${liveMatch.home_score} - ${liveMatch.away_score}`
+                      : nextMatch
+                        ? `${nextMatchTime} · ${nextMatch.phase || nextMatch.round}`
+                        : "No hay más partidos programados"
                   }
                 />
               </div>
@@ -290,6 +315,8 @@ export default function App() {
               <PredictionList matches={matches} groups={groups} />
             </div>
           )}
+
+          {activeTab === "scorers" && <TopScorers scorers={topScorers} />}
         </main>
       )}
 

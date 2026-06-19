@@ -1,35 +1,7 @@
 import React from "react";
-import { Sparkles, TrendingUp } from "lucide-react";
+import { Database, Sparkles, TrendingUp } from "lucide-react";
 import { globalTeamCodes as teamCodes, flagUrl } from "../constants/teamCodes";
-
-function predictMatch(home, away) {
-  const homePower =
-    (home?.points || 0) * 3 +
-    (home?.wins || 0) * 2 +
-    (home?.goal_difference || 0) +
-    (home?.goals_for || 0);
-
-  const awayPower =
-    (away?.points || 0) * 3 +
-    (away?.wins || 0) * 2 +
-    (away?.goal_difference || 0) +
-    (away?.goals_for || 0);
-
-  const baseHome = homePower === 0 ? 15 : homePower;
-  const baseAway = awayPower === 0 ? 15 : awayPower;
-
-  const total = baseHome + baseAway + 10;
-
-  const homeChance = Math.round(((baseHome + 5) / total) * 100);
-  const awayChance = Math.round(((baseAway + 5) / total) * 100);
-  const drawChance = Math.max(100 - homeChance - awayChance, 10);
-
-  return {
-    home: Math.max(homeChance - 5, 20),
-    draw: drawChance,
-    away: Math.max(awayChance - 5, 20),
-  };
-}
+import { predictMatch } from "../utils/prediction";
 
 export default function PredictionList({ matches, groups }) {
   const pendingMatches = matches.filter((m) => m.status !== "complete").slice(0, 10);
@@ -116,6 +88,25 @@ export default function PredictionList({ matches, groups }) {
                 tiene mayor ventaja
               </span>
             </div>
+
+            <div className="prediction-model-info">
+              <span>
+                xG estimado: {prediction.expectedGoals.home} – {prediction.expectedGoals.away}
+              </span>
+              <span
+                className={`confidence confidence-${prediction.confidence.level.toLowerCase()}`}
+              >
+                Confianza {prediction.confidence.level} · {prediction.confidence.score}%
+              </span>
+            </div>
+            <div className="prediction-source">
+              <Database size={13} />
+              <span>
+                {prediction.metadata.methodology} · FIFA actualizada{" "}
+                {new Date(`${prediction.metadata.updatedAt}T00:00:00`).toLocaleDateString("es-CR")}
+              </span>
+            </div>
+            <small className="prediction-disclaimer">{prediction.metadata.disclaimer}</small>
           </div>
         );
       })}

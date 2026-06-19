@@ -1002,7 +1002,7 @@ export const mockMatches = [
     home_score: 2,
     away_score: 0,
     kickoff_utc: "2026-06-19T19:00:00Z",
-    status: "live",
+    status: "complete",
     phase: "Grupo D",
     stadium: "Lumen Field",
     round: "Grupo D",

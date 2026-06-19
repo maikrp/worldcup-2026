@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 
-// FIFA World Cup 2026 Bracket
+// Proyección del formato de eliminación del Mundial 2026.
 // 48 teams, 12 groups → Round of 32 (16 matches) → Round of 16 → QF → SF → Final
 
 const BRACKET_STRUCTURE = {
-  // Based on FIFA's official bracket path for World Cup 2026
-  // Groups A-L, top 2 + 8 best 3rd-place teams advance → Round of 32
+  // Los cruces son una visualización simplificada. No sustituyen el bracket oficial.
   rounds: [
     {
       id: "r32",
@@ -118,7 +117,7 @@ export default function Bracket() {
       </div>
 
       <div className="bracket-info-banner">
-        <span>⚽ Mundial 2026 — 48 equipos / 12 grupos</span>
+        <span>⚽ Proyección del formato — 48 equipos / 12 grupos</span>
         <span className="bracket-info-pill">Ronda de 32 → Octavos → Cuartos → Semis → Final</span>
       </div>
 
