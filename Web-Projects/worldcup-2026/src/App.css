@@ -11,7 +11,7 @@
   --color-secondary: #10b981;
   --color-accent: #f59e0b;
   --color-danger: #ef4444;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -36,30 +36,44 @@ body {
 }
 
 .header {
-  background: 
-    linear-gradient(135deg, rgba(11,15,25,0.82) 0%, rgba(19,27,46,0.75) 50%, rgba(11,15,25,0.88) 100%),
-    url('/header-bg.webp') center center / cover no-repeat;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(11, 15, 25, 0.82) 0%,
+      rgba(19, 27, 46, 0.75) 50%,
+      rgba(11, 15, 25, 0.88) 100%
+    ),
+    url("/header-bg.webp") center center / cover no-repeat;
   border: 1px solid var(--border-color);
   padding: 20px 32px;
   border-radius: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--shadow-lg), 0 0 40px rgba(59,130,246,0.12);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 40px rgba(59, 130, 246, 0.12);
   position: relative;
   overflow: visible;
   min-height: 270px;
 }
 
 .header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
   border-radius: 20px 20px 0 0;
-  background: linear-gradient(90deg, transparent, var(--color-primary), var(--color-secondary), var(--color-accent), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-primary),
+    var(--color-secondary),
+    var(--color-accent),
+    transparent
+  );
 }
 
 .header-brand {
@@ -206,7 +220,9 @@ body {
   align-items: center;
   gap: 20px;
   box-shadow: var(--shadow-md);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .stat-card:hover {
@@ -229,9 +245,15 @@ body {
   height: 24px;
 }
 
-.text-primary { color: var(--color-primary); }
-.text-secondary { color: var(--color-secondary); }
-.text-accent { color: var(--color-accent); }
+.text-primary {
+  color: var(--color-primary);
+}
+.text-secondary {
+  color: var(--color-secondary);
+}
+.text-accent {
+  color: var(--color-accent);
+}
 
 .stat-details {
   display: flex;
@@ -344,9 +366,15 @@ body {
   height: 20px;
 }
 
-.fav-award.golden { color: var(--color-accent); }
-.fav-award.silver { color: #cbd5e1; }
-.fav-award.bronze { color: #b45309; }
+.fav-award.golden {
+  color: var(--color-accent);
+}
+.fav-award.silver {
+  color: #cbd5e1;
+}
+.fav-award.bronze {
+  color: #b45309;
+}
 
 .match-grid {
   display: grid;
@@ -363,7 +391,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .match-card:hover {
@@ -408,7 +438,7 @@ body {
 }
 
 .status-badge.live-blink::before {
-  content: '';
+  content: "";
   width: 6px;
   height: 6px;
   background-color: var(--color-primary);
@@ -573,8 +603,12 @@ td {
   color: var(--color-accent);
 }
 
-.text-pos { color: var(--color-secondary); }
-.text-neg { color: var(--color-danger); }
+.text-pos {
+  color: var(--color-secondary);
+}
+.text-neg {
+  color: var(--color-danger);
+}
 
 /* ======================== BRACKET ======================== */
 .bracket-container {
@@ -620,7 +654,7 @@ td {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(90deg, rgba(59,130,246,0.08) 0%, rgba(16,185,129,0.08) 100%);
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%);
   border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 10px;
   padding: 10px 16px;
@@ -631,7 +665,7 @@ td {
 }
 
 .bracket-info-pill {
-  background: rgba(16,185,129,0.15);
+  background: rgba(16, 185, 129, 0.15);
   color: var(--color-secondary);
   border-radius: 20px;
   padding: 3px 12px;
@@ -952,8 +986,14 @@ td {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .loading-container {
@@ -976,7 +1016,9 @@ td {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .no-data {
@@ -993,9 +1035,6 @@ td {
   border-top: 1px solid var(--border-color);
   padding-top: 24px;
 }
-
-
-
 
 /* Partidos del Día Styles */
 .matches-by-date-card {
@@ -1312,11 +1351,14 @@ td {
     align-items: stretch;
     gap: 12px;
   }
-  .search-box, .date-filter-box, .sort-select {
+  .search-box,
+  .date-filter-box,
+  .sort-select {
     width: 100%;
     box-sizing: border-box;
   }
-  .search-box input, .date-select {
+  .search-box input,
+  .date-select {
     width: 100%;
   }
 }
@@ -1361,8 +1403,14 @@ td {
 }
 
 @keyframes live-blink-animation {
-  from { opacity: 0.3; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1.1); }
+  from {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 .status-badge.live {

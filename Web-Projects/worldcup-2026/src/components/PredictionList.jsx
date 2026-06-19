@@ -32,7 +32,7 @@ function predictMatch(home, away) {
 }
 
 export default function PredictionList({ matches, groups }) {
-  const pendingMatches = matches.filter(m => m.status !== "complete").slice(0, 10);
+  const pendingMatches = matches.filter((m) => m.status !== "complete").slice(0, 10);
 
   function findTeamStats(name) {
     for (const group of groups) {
@@ -58,26 +58,32 @@ export default function PredictionList({ matches, groups }) {
           <div className="prediction-card" key={m.id}>
             <div className="prediction-header">
               <span>{m.phase || m.round}</span>
-              <span className="prediction-badge"><Sparkles size={12} /> Probabilidad</span>
+              <span className="prediction-badge">
+                <Sparkles size={12} /> Probabilidad
+              </span>
             </div>
 
             <div className="prediction-matchup">
               <div className="predict-team">
-                <img 
-                  src={flagUrl(teamCodes[m.home_team] || "un")} 
-                  alt={m.home_team} 
+                <img
+                  src={flagUrl(teamCodes[m.home_team] || "un")}
+                  alt={m.home_team}
                   className="predict-flag"
-                  onError={(e) => { e.target.src = "https://flagcdn.com/w40/un.png"; }}
+                  onError={(e) => {
+                    e.target.src = "https://flagcdn.com/w40/un.png";
+                  }}
                 />
                 <strong>{m.home_team}</strong>
               </div>
               <span className="vs">VS</span>
               <div className="predict-team">
-                <img 
-                  src={flagUrl(teamCodes[m.away_team] || "un")} 
-                  alt={m.away_team} 
+                <img
+                  src={flagUrl(teamCodes[m.away_team] || "un")}
+                  alt={m.away_team}
                   className="predict-flag"
-                  onError={(e) => { e.target.src = "https://flagcdn.com/w40/un.png"; }}
+                  onError={(e) => {
+                    e.target.src = "https://flagcdn.com/w40/un.png";
+                  }}
                 />
                 <strong>{m.away_team}</strong>
               </div>
@@ -95,11 +101,19 @@ export default function PredictionList({ matches, groups }) {
                 <div className="bar away" style={{ width: `${prediction.away}%` }}></div>
               </div>
             </div>
-            
+
             <div className="prediction-verdict">
               <TrendingUp size={14} className="verdict-icon" />
               <span>
-                Pronóstico: <strong>{prediction.home > prediction.away ? m.home_team : prediction.away > prediction.home ? m.away_team : "Empate"}</strong> tiene mayor ventaja
+                Pronóstico:{" "}
+                <strong>
+                  {prediction.home > prediction.away
+                    ? m.home_team
+                    : prediction.away > prediction.home
+                      ? m.away_team
+                      : "Empate"}
+                </strong>{" "}
+                tiene mayor ventaja
               </span>
             </div>
           </div>

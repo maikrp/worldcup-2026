@@ -11,7 +11,7 @@ function getLiveMinute(kickoffUtc) {
     if (diffMins > 90) return "90+2'";
     if (diffMins > 45 && diffMins < 60) return "Int.";
     return `${diffMins}'`;
-  } catch (e) {
+  } catch {
     return "15'";
   }
 }
@@ -54,11 +54,13 @@ export default function MatchGrid({ matches, groups }) {
             <div className="teams-container">
               <div className="team-row">
                 <div className="team-name-flag">
-                  <img 
-                    src={flagUrl(teamCodes[m.home_team] || "un")} 
-                    alt={m.home_team} 
+                  <img
+                    src={flagUrl(teamCodes[m.home_team] || "un")}
+                    alt={m.home_team}
                     className="flag-img"
-                    onError={(e) => { e.target.src = "https://flagcdn.com/w40/un.png"; }}
+                    onError={(e) => {
+                      e.target.src = "https://flagcdn.com/w40/un.png";
+                    }}
                   />
                   <span>{m.home_team}</span>
                 </div>
@@ -67,11 +69,13 @@ export default function MatchGrid({ matches, groups }) {
 
               <div className="team-row">
                 <div className="team-name-flag">
-                  <img 
-                    src={flagUrl(teamCodes[m.away_team] || "un")} 
-                    alt={m.away_team} 
+                  <img
+                    src={flagUrl(teamCodes[m.away_team] || "un")}
+                    alt={m.away_team}
                     className="flag-img"
-                    onError={(e) => { e.target.src = "https://flagcdn.com/w40/un.png"; }}
+                    onError={(e) => {
+                      e.target.src = "https://flagcdn.com/w40/un.png";
+                    }}
                   />
                   <span>{m.away_team}</span>
                 </div>
@@ -101,10 +105,10 @@ export default function MatchGrid({ matches, groups }) {
               <div className="info-item">
                 <Clock size={12} />
                 <span>
-                  {new Date(m.kickoff_utc).toLocaleString("es-CR", { 
-                    timeZone: "America/Costa_Rica", 
-                    dateStyle: "short", 
-                    timeStyle: "short" 
+                  {new Date(m.kickoff_utc).toLocaleString("es-CR", {
+                    timeZone: "America/Costa_Rica",
+                    dateStyle: "short",
+                    timeStyle: "short",
                   })}
                 </span>
               </div>
@@ -115,4 +119,3 @@ export default function MatchGrid({ matches, groups }) {
     </div>
   );
 }
-

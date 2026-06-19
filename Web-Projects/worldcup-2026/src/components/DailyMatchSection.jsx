@@ -10,14 +10,14 @@ function getCostaRicaDateString(kickoffUtc) {
       timeZone: "America/Costa_Rica",
       year: "numeric",
       month: "2-digit",
-      day: "2-digit"
+      day: "2-digit",
     });
     const parts = formatter.formatToParts(date);
-    const year = parts.find(p => p.type === 'year').value;
-    const month = parts.find(p => p.type === 'month').value;
-    const day = parts.find(p => p.type === 'day').value;
+    const year = parts.find((p) => p.type === "year").value;
+    const month = parts.find((p) => p.type === "month").value;
+    const day = parts.find((p) => p.type === "day").value;
     return `${year}-${month}-${day}`;
-  } catch (e) {
+  } catch {
     return kickoffUtc.split("T")[0];
   }
 }
@@ -32,16 +32,18 @@ function getLiveMinute(kickoffUtc) {
     if (diffMins > 90) return "90+2'";
     if (diffMins > 45 && diffMins < 60) return "Int.";
     return `${diffMins}'`;
-  } catch (e) {
+  } catch {
     return "15'";
   }
 }
 
 export default function DailyMatchSection({ matches, groups, selectedDate, onPrevDay, onNextDay }) {
-  const dailyMatches = matches.filter(m => {
-    const CRDate = getCostaRicaDateString(m.kickoff_utc);
-    return CRDate === selectedDate;
-  }).sort((a, b) => new Date(a.kickoff_utc) - new Date(b.kickoff_utc));
+  const dailyMatches = matches
+    .filter((m) => {
+      const CRDate = getCostaRicaDateString(m.kickoff_utc);
+      return CRDate === selectedDate;
+    })
+    .sort((a, b) => new Date(a.kickoff_utc) - new Date(b.kickoff_utc));
 
   function formatDateSpanish(dateStr) {
     const d = new Date(dateStr + "T00:00:00");
@@ -63,12 +65,16 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
       <div className="section-header date-header">
         <h2>📅 Partidos de la Fecha</h2>
         <div className="date-navigator">
-          <button className="date-nav-btn" onClick={onPrevDay}>◀</button>
+          <button className="date-nav-btn" onClick={onPrevDay}>
+            ◀
+          </button>
           <span className="current-date-label">{formatDateSpanish(selectedDate)}</span>
-          <button className="date-nav-btn" onClick={onNextDay}>▶</button>
+          <button className="date-nav-btn" onClick={onNextDay}>
+            ▶
+          </button>
         </div>
       </div>
-      
+
       <div className="daily-matches-list">
         {dailyMatches.length === 0 ? (
           <div className="no-matches-today">
@@ -82,23 +88,28 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
             const pred = predictMatch(homeStats, awayStats);
 
             return (
-              <div className={`daily-match-row ${m.status === "live" ? "live-match-row" : ""}`} key={m.id}>
+              <div
+                className={`daily-match-row ${m.status === "live" ? "live-match-row" : ""}`}
+                key={m.id}
+              >
                 <div className="daily-match-info-meta">
                   <span className="daily-match-phase">{m.phase || m.round}</span>
                   <span className="daily-match-stadium">{m.stadium}</span>
                 </div>
-                
+
                 <div className="daily-match-teams-box">
                   <div className="daily-team home">
                     <span className="daily-team-name">{m.home_team}</span>
-                    <img 
-                      src={flagUrl(teamCodes[m.home_team] || "un")} 
-                      alt={m.home_team} 
+                    <img
+                      src={flagUrl(teamCodes[m.home_team] || "un")}
+                      alt={m.home_team}
                       className="daily-flag"
-                      onError={(e) => { e.target.src = "https://flagcdn.com/w40/un.png"; }}
+                      onError={(e) => {
+                        e.target.src = "https://flagcdn.com/w40/un.png";
+                      }}
                     />
                   </div>
-                  
+
                   <div className="daily-score-box">
                     {m.status === "complete" || m.status === "live" ? (
                       <div className="daily-score-wrapper-container">
@@ -118,18 +129,25 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                       <div className="daily-time-box">
                         <Clock size={12} />
                         <span>
-                          {new Date(m.kickoff_utc).toLocaleTimeString("es-CR", { timeZone: "America/Costa_Rica", hour: "2-digit", minute: "2-digit", hour12: false })}
+                          {new Date(m.kickoff_utc).toLocaleTimeString("es-CR", {
+                            timeZone: "America/Costa_Rica",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          })}
                         </span>
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="daily-team away">
-                    <img 
-                      src={flagUrl(teamCodes[m.away_team] || "un")} 
-                      alt={m.away_team} 
+                    <img
+                      src={flagUrl(teamCodes[m.away_team] || "un")}
+                      alt={m.away_team}
                       className="daily-flag"
-                      onError={(e) => { e.target.src = "https://flagcdn.com/w40/un.png"; }}
+                      onError={(e) => {
+                        e.target.src = "https://flagcdn.com/w40/un.png";
+                      }}
                     />
                     <span className="daily-team-name">{m.away_team}</span>
                   </div>
@@ -138,9 +156,13 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                 <div className="match-prediction-bar-container">
                   <div className="prediction-label-compact">
                     <span>Predicción:</span>
-                    <span>{m.home_team} {pred.home}%</span>
+                    <span>
+                      {m.home_team} {pred.home}%
+                    </span>
                     <span>Empate {pred.draw}%</span>
-                    <span>{m.away_team} {pred.away}%</span>
+                    <span>
+                      {m.away_team} {pred.away}%
+                    </span>
                   </div>
                   <div className="bar-wrapper-compact">
                     <div className="bar local" style={{ width: `${pred.home}%` }}></div>
@@ -156,5 +178,3 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
     </div>
   );
 }
-
-

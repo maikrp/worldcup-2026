@@ -38,7 +38,7 @@ El proyecto está activo y compila correctamente para producción. Es una SPA co
 
 ## Pendientes recomendados
 
-- Configurar ESLint y Prettier dentro del proyecto; actualmente no existen scripts ni configuración local.
+- ESLint 9 y Prettier configurados localmente con scripts de validación y corrección.
 - Agregar pruebas unitarias y una prueba E2E de humo.
 - Ejecutar validación visual manual en 320 px, 375 px, tablet y escritorio.
 - Sustituir o retirar cualquier asset fuente redundante que no utilice la aplicación.
