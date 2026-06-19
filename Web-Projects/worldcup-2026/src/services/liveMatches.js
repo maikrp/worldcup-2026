@@ -71,16 +71,28 @@ function normalizeName(name) {
 }
 
 export async function fetchLiveMatches(signal) {
-  const response = await fetch("/api/live", {
-    signal,
-    headers: { Accept: "application/json" },
-  });
+  const sources = ["https://worldcup26.ir/get/games", "/api/live"];
+  let payload;
 
-  if (!response.ok) throw new Error("Live synchronization failed");
-  const payload = await response.json();
+  for (const source of sources) {
+    try {
+      const response = await fetch(source, {
+        signal,
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) continue;
+      payload = await response.json();
+      break;
+    } catch (error) {
+      if (error.name === "AbortError") throw error;
+    }
+  }
+
+  if (!payload) throw new Error("Live synchronization failed");
 
   return {
-    syncedAt: payload.syncedAt,
+    syncedAt: payload.syncedAt || new Date().toISOString(),
     matches: (payload.games || []).map((game) => ({
       sourceId: game.id,
       home_team: normalizeName(game.home_team_name_en),
