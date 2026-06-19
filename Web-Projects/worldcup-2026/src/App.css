@@ -18,16 +18,33 @@
   --glow-primary: 0 0 15px rgba(59, 130, 246, 0.3);
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .app {
+  width: 100%;
   max-width: 1400px;
+  min-width: 0;
   margin: 0 auto;
   padding: 32px 24px;
   display: flex;
@@ -994,6 +1011,9 @@ td {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .bracket-round-tabs {
@@ -1054,8 +1074,24 @@ td {
 }
 
 .bracket-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  overflow-y: hidden;
   padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+  touch-action: pan-x pan-y;
+}
+
+.bracket-scroll-hint {
+  display: none;
+  margin: -8px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-align: right;
 }
 
 .bracket {
@@ -1078,6 +1114,44 @@ td {
   flex-direction: column;
   flex: 1;
   min-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .app {
+    padding: 18px 12px;
+    gap: 18px;
+  }
+
+  .content-area {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .bracket-round-tabs {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bracket-tab {
+    flex: 0 0 auto;
+  }
+
+  .bracket-scroll-hint {
+    display: block;
+  }
+
+  .bracket {
+    gap: 14px;
+    padding: 6px 2px 10px;
+  }
+
+  .round {
+    min-width: 170px;
+  }
 }
 
 .round-title {

@@ -121,7 +121,18 @@ export default function Bracket() {
         <span className="bracket-info-pill">Ronda de 32 → Octavos → Cuartos → Semis → Final</span>
       </div>
 
-      <div className="bracket-wrapper">
+      {activeRound === "all" && (
+        <p className="bracket-scroll-hint" aria-hidden="true">
+          Desliza hacia la izquierda para ver las demás rondas →
+        </p>
+      )}
+
+      <div
+        className="bracket-wrapper"
+        role="region"
+        aria-label="Llaves del torneo; desplázate horizontalmente para ver todas las rondas"
+        tabIndex="0"
+      >
         <div className={`bracket${activeRound === "all" ? " bracket-full" : " bracket-single"}`}>
           {visibleRounds.map((round) => (
             <div className="round" key={round.id}>
