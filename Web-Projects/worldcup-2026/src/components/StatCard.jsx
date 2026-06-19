@@ -1,12 +1,12 @@
 import React from "react";
 
-export default function StatCard({ icon, title, value, sub }) {
+export default function StatCard({ icon, title, value, sub, valueContent }) {
   return (
     <div className="stat-card">
-      <div className="stat-icon-wrapper">{icon}</div>
+      {icon && <div className="stat-icon-wrapper">{icon}</div>}
       <div className="stat-details">
         <span>{title}</span>
-        <strong>{value}</strong>
+        {valueContent || <strong>{value}</strong>}
         <small>{sub}</small>
       </div>
     </div>

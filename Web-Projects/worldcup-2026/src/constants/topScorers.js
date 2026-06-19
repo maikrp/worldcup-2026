@@ -3,11 +3,16 @@ export const topScorers = [
     name: "Kylian Mbappé",
     team: "Francia",
     teamCode: "fr",
-    goals: 4,
+    goals: 3,
     assists: 1,
     matches: 2,
     minutes: 166,
     photo: "/players/mbappe.webp",
+    goalEvents: [
+      { opponent: "Senegal", date: "2026-06-16", result: "3–1", minute: "18'" },
+      { opponent: "Senegal", date: "2026-06-16", result: "3–1", minute: "54'" },
+      { opponent: "Senegal", date: "2026-06-16", result: "3–1", minute: "81'" },
+    ],
   },
   {
     name: "Christian Pulisic",
@@ -18,6 +23,11 @@ export const topScorers = [
     matches: 2,
     minutes: 174,
     photo: "/players/pulisic.webp",
+    goalEvents: [
+      { opponent: "Paraguay", date: "2026-06-12", result: "4–1", minute: "22'" },
+      { opponent: "Paraguay", date: "2026-06-12", result: "4–1", minute: "67'" },
+      { opponent: "Australia", date: "2026-06-19", result: "2–0", minute: "39'" },
+    ],
   },
   {
     name: "Harry Kane",
@@ -28,6 +38,11 @@ export const topScorers = [
     matches: 2,
     minutes: 180,
     photo: "/players/kane.webp",
+    goalEvents: [
+      { opponent: "Croacia", date: "2026-06-17", result: "4–2", minute: "12'" },
+      { opponent: "Croacia", date: "2026-06-17", result: "4–2", minute: "48'" },
+      { opponent: "Croacia", date: "2026-06-17", result: "4–2", minute: "76'" },
+    ],
   },
   {
     name: "Lionel Messi",
@@ -38,5 +53,9 @@ export const topScorers = [
     matches: 2,
     minutes: 168,
     photo: "/players/messi.webp",
+    goalEvents: [
+      { opponent: "Argelia", date: "2026-06-16", result: "3–0", minute: "31'" },
+      { opponent: "Argelia", date: "2026-06-16", result: "3–0", minute: "70'" },
+    ],
   },
 ];

@@ -24,8 +24,6 @@ function getCostaRicaDateString(kickoffUtc) {
 
 function getLiveMinute(kickoffUtc) {
   try {
-    // Current time is simulated as 2026-06-19 14:16:40 Costa Rica time (which is 20:16:40 UTC)
-    // We calculate standard dynamic minutes based on system clock
     const diffMs = new Date() - new Date(kickoffUtc);
     const diffMins = Math.floor(diffMs / 60000);
     if (diffMins < 0) return "1'";
@@ -114,9 +112,9 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                     {m.status === "complete" || m.status === "live" ? (
                       <div className="daily-score-wrapper-container">
                         <div className="daily-score-values">
-                          <span className="score-val">{m.home_score}</span>
+                          <span className="score-val">{m.home_score ?? 0}</span>
                           <span className="score-divider">-</span>
-                          <span className="score-val">{m.away_score}</span>
+                          <span className="score-val">{m.away_score ?? 0}</span>
                         </div>
                         {m.status === "live" && (
                           <div className="live-time-indicator">

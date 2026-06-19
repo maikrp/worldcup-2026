@@ -4,21 +4,33 @@
 
 ## Estado general
 
-El proyecto está activo y compila correctamente para producción. Es una SPA construida con React 18 y Vite 5.1.4, orientada al seguimiento del Mundial 2026.
+El proyecto está activo, compila correctamente para producción y está preparado como PWA. Es una
+SPA construida con React 18 y Vite 5.1.4, orientada al seguimiento del Mundial 2026 mediante datos
+locales, visualizaciones y pronósticos estadísticos.
 
 ## Realizado hasta ahora
 
 - Dashboard principal con resumen del torneo y navegación por secciones.
 - Calendario diario con navegación entre fechas.
 - Listado general de partidos con búsqueda, filtro por fecha y orden ascendente/descendente.
+- Calendario completo de fase de grupos: 72 partidos, 48 selecciones y tres encuentros por equipo.
 - Tablas para los 12 grupos (A–L).
-- Bracket completo y navegable para la fase eliminatoria.
-- Módulo de predicciones basado en estadísticas disponibles.
+- Bracket navegable presentado expresamente como proyección del formato eliminatorio.
+- Pronósticos mediante modelo de fuerza internacional + forma local + distribución Poisson.
+- Pronósticos con xG estimado, nivel de confianza, fuente, fecha de referencia y probabilidades que
+  suman exactamente 100%.
+- Filtros de pronósticos por selección, fecha y orden cronológico.
+- Sección de goleadores con fotografías locales y popup de detalle por partido y minuto del gol.
+- Estado automático de partidos: los encuentros dejan de aparecer en vivo al finalizar su ventana.
+- Tarjeta de próximo partido con banderas, equipos, hora y grupo.
 - Separación del antiguo componente monolítico en componentes reutilizables.
 - Constantes y utilidades extraídas a módulos independientes.
 - Cálculo de posiciones y predicciones separado de la capa visual.
-- Identidad visual actualizada con logo local y fondo WebP.
+- Identidad visual actualizada con logo local, hero panorámico WebP y mascotas.
 - Estilos responsivos con tratamiento específico para móvil, tablet y escritorio.
+- PWA instalable con manifest, service worker, caché offline e iconos propios.
+- Metadatos Open Graph y Twitter con tarjeta social de 1200 × 630 para compartir enlaces.
+- ESLint 9 y Prettier configurados localmente.
 
 ## Arquitectura actual
 
@@ -31,9 +43,15 @@ El proyecto está activo y compila correctamente para producción. Es una SPA co
 ## Validaciones realizadas
 
 - `npm run build`: aprobado el 19 de junio de 2026.
-- Vite procesó 1481 módulos sin errores.
-- Salida principal: JavaScript gzip aproximado de 55 KB y CSS gzip aproximado de 4 KB.
+- Vite procesó 1485 módulos sin errores.
+- Salida principal: JavaScript gzip aproximado de 60 KB y CSS gzip aproximado de 5.5 KB.
 - La importación de los nuevos módulos quedó validada por el build.
+- `npm run lint`: aprobado sin errores.
+- `npm run format:check`: aprobado.
+- `npm audit --omit=dev`: cero vulnerabilidades de producción.
+- Auditoría estructural: 12 grupos, 48 selecciones, 72 partidos, seis encuentros por grupo y tres
+  rivales únicos por selección.
+- Sin IDs duplicados, cruces fuera de grupo ni probabilidades inválidas.
 - Se verificó la existencia de `C:\Python\Toolbox\ebs_audit_master.py`.
 - PWA instalable con manifest, service worker, caché offline e iconos propios.
 - Metadatos Open Graph y Twitter configurados con imagen social 1200 × 630.
@@ -43,12 +61,14 @@ El proyecto está activo y compila correctamente para producción. Es una SPA co
 
 ## Pendientes recomendados
 
-- ESLint 9 y Prettier configurados localmente con scripts de validación y corrección.
 - Agregar pruebas unitarias y una prueba E2E de humo.
 - Ejecutar validación visual manual en 320 px, 375 px, tablet y escritorio.
-- Sustituir o retirar cualquier asset fuente redundante que no utilice la aplicación.
+- Retirar los archivos auxiliares no utilizados `remove_bg.py` y `public/wc2026-logo.jpg` si ya no se
+  necesitan como fuente.
 - Definir una estrategia de datos en vivo estable y manejo visible de errores de red.
 - Agregar `README.md` con instalación, arquitectura y comandos.
+- Configurar `VITE_SITE_URL` con el dominio público definitivo en producción para que WhatsApp y
+  Facebook resuelvan correctamente la tarjeta social.
 
 ## Nota de Git
 

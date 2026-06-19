@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Calendar,
   BarChart3,
-  Flame,
   Search,
   Sparkles,
   Award,
@@ -23,14 +22,12 @@ import TopScorers from "./components/TopScorers";
 
 // Constants & Data
 import { mockGroups, mockMatches } from "./constants/mockData";
-import { flagUrl } from "./constants/teamCodes";
+import { flagUrl, globalTeamCodes } from "./constants/teamCodes";
 import { topScorers } from "./constants/topScorers";
 import { normalizeMatchStatuses } from "./utils/matchStatus";
 import { calculateStandings } from "./utils/standings";
 
 export default function App() {
-  const matches = normalizeMatchStatuses(mockMatches);
-  const groups = calculateStandings(mockGroups, matches);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,6 +35,14 @@ export default function App() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [matchDateFilter, setMatchDateFilter] = useState("");
   const [currentTime] = useState(() => Date.now());
+  const [statusClock, setStatusClock] = useState(() => Date.now());
+  const matches = normalizeMatchStatuses(mockMatches, new Date(statusClock));
+  const groups = calculateStandings(mockGroups, matches);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setStatusClock(Date.now()), 30000);
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   const liveMatch = matches.find((match) => match.status === "live");
   const nextMatch = matches
@@ -53,6 +58,7 @@ export default function App() {
         minute: "2-digit",
       }).format(new Date(nextMatch.kickoff_utc))
     : null;
+  const featuredMatch = liveMatch || nextMatch;
 
   const handlePrevDay = () => {
     const current = new Date(selectedDate + "T00:00:00");
@@ -112,13 +118,9 @@ export default function App() {
             <img src="/wc2026-logo.png" alt="Mundial 2026 Logo" className="logo-img" />
           </div>
           <div>
-            <h1>Mundial 2026</h1>
-            <p>Dashboard no oficial · Predicciones, grupos y partidos</p>
+            <h1>FIFA WorldCup 2026</h1>
+            <p>Predicciones, grupos y partidos</p>
           </div>
-        </div>
-
-        <div className="api-badge-container">
-          <span className="api-badge mock">Datos locales · No oficial</span>
         </div>
       </header>
 
@@ -151,7 +153,7 @@ export default function App() {
           className={activeTab === "predictions" ? "active" : ""}
           onClick={() => setActiveTab("predictions")}
         >
-          <Percent size={18} /> Predicciones
+          <Percent size={18} /> Pronósticos
         </button>
         <button
           className={activeTab === "scorers" ? "active" : ""}
@@ -184,8 +186,28 @@ export default function App() {
                   sub="Fase de grupos A - L"
                 />
                 <StatCard
-                  icon={<Flame className="text-accent" />}
                   title={liveMatch ? "🔴 En Vivo Ahora" : "Próximo Partido"}
+                  valueContent={
+                    featuredMatch ? (
+                      <div className="next-match-teams">
+                        <div className="next-match-team">
+                          <img
+                            src={flagUrl(globalTeamCodes[featuredMatch.home_team])}
+                            alt={`Bandera de ${featuredMatch.home_team}`}
+                          />
+                          <strong>{featuredMatch.home_team}</strong>
+                        </div>
+                        <span>vs</span>
+                        <div className="next-match-team">
+                          <img
+                            src={flagUrl(globalTeamCodes[featuredMatch.away_team])}
+                            alt={`Bandera de ${featuredMatch.away_team}`}
+                          />
+                          <strong>{featuredMatch.away_team}</strong>
+                        </div>
+                      </div>
+                    ) : null
+                  }
                   value={
                     liveMatch
                       ? `${liveMatch.home_team} vs ${liveMatch.away_team}`
@@ -195,7 +217,7 @@ export default function App() {
                   }
                   sub={
                     liveMatch
-                      ? `${liveMatch.home_score} - ${liveMatch.away_score}`
+                      ? `${liveMatch.home_score ?? 0} - ${liveMatch.away_score ?? 0}`
                       : nextMatch
                         ? `${nextMatchTime} · ${nextMatch.phase || nextMatch.round}`
                         : "No hay más partidos programados"
