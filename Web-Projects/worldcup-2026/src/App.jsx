@@ -149,7 +149,6 @@ const mockMatches = [
   { id: 16, home_team: "Irak", away_team: "Noruega", home_score: 1, away_score: 4, kickoff_utc: "2026-06-16T20:00:00Z", status: "complete", phase: "Grupo I", stadium: "Arrowhead Stadium", round: "Grupo I" },
   { id: 17, home_team: "Uzbekistán", away_team: "Colombia", home_score: 1, away_score: 3, kickoff_utc: "2026-06-18T20:00:00Z", status: "complete", phase: "Grupo K", stadium: "SoFi Stadium", round: "Grupo K" },
   { id: 18, home_team: "Estados Unidos", away_team: "Australia", home_score: null, away_score: null, kickoff_utc: "2026-06-19T20:00:00Z", status: "scheduled", phase: "Grupo D", stadium: "Lumen Field", round: "Grupo D" },
-];und: "Octavos" },
 ];
 
 function predictMatch(home, away) {
@@ -207,7 +206,11 @@ export default function App() {
       <header className="header">
         <div className="header-brand">
           <div className="logo-container">
-            <Trophy className="trophy-logo animate-pulse" size={38} />
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/4/43/2026_FIFA_World_Cup_emblem.svg" 
+              alt="Mundial 2026 Logo" 
+              className="logo-img"
+            />
           </div>
           <div>
             <h1>Mundial 2026</h1>

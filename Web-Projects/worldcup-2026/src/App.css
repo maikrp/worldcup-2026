@@ -855,3 +855,15 @@ td {
   border-top: 1px solid var(--border-color);
   padding-top: 24px;
 }
+
+.logo-img {
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.25));
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
