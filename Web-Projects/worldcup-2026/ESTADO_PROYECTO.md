@@ -22,6 +22,10 @@ locales, visualizaciones y pronósticos estadísticos.
 - Filtros de pronósticos por selección, fecha y orden cronológico.
 - Sección de goleadores con fotografías locales y popup de detalle por partido y minuto del gol.
 - Estado automático de partidos: los encuentros dejan de aparecer en vivo al finalizar su ventana.
+- Sincronización de marcadores cada 30 segundos mediante `worldcup26.ir/get/games`.
+- Función serverless `/api/live` con caché de 20 segundos, respaldo local y señal visual de conexión.
+- Actualización automática de marcador, estado, goleadores, minuto estimado y tablas durante partidos
+  activos.
 - Tarjeta de próximo partido con banderas, equipos, hora y grupo.
 - Separación del antiguo componente monolítico en componentes reutilizables.
 - Constantes y utilidades extraídas a módulos independientes.

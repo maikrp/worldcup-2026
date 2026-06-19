@@ -24,6 +24,7 @@ import TopScorers from "./components/TopScorers";
 import { mockGroups, mockMatches } from "./constants/mockData";
 import { flagUrl, globalTeamCodes } from "./constants/teamCodes";
 import { topScorers } from "./constants/topScorers";
+import { fetchLiveMatches, mergeLiveMatches } from "./services/liveMatches";
 import { normalizeMatchStatuses } from "./utils/matchStatus";
 import { calculateStandings } from "./utils/standings";
 
@@ -36,12 +37,45 @@ export default function App() {
   const [matchDateFilter, setMatchDateFilter] = useState("");
   const [currentTime] = useState(() => Date.now());
   const [statusClock, setStatusClock] = useState(() => Date.now());
-  const matches = normalizeMatchStatuses(mockMatches, new Date(statusClock));
+  const [remoteMatches, setRemoteMatches] = useState([]);
+  const [lastLiveSync, setLastLiveSync] = useState(null);
+  const [liveSyncStatus, setLiveSyncStatus] = useState("connecting");
+  const matches = normalizeMatchStatuses(
+    mergeLiveMatches(mockMatches, remoteMatches),
+    new Date(statusClock)
+  );
   const groups = calculateStandings(mockGroups, matches);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => setStatusClock(Date.now()), 30000);
     return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    let activeController;
+
+    const synchronizeLiveMatches = async () => {
+      activeController?.abort();
+      activeController = new AbortController();
+
+      try {
+        const liveData = await fetchLiveMatches(activeController.signal);
+        setRemoteMatches(liveData.matches);
+        setLastLiveSync(liveData.syncedAt || new Date().toISOString());
+        setLiveSyncStatus("online");
+        setStatusClock(Date.now());
+      } catch (error) {
+        if (error.name !== "AbortError") setLiveSyncStatus("offline");
+      }
+    };
+
+    synchronizeLiveMatches();
+    const intervalId = window.setInterval(synchronizeLiveMatches, 30000);
+
+    return () => {
+      window.clearInterval(intervalId);
+      activeController?.abort();
+    };
   }, []);
 
   const liveMatch = matches.find((match) => match.status === "live");
@@ -172,6 +206,23 @@ export default function App() {
         <main className="content-area">
           {activeTab === "dashboard" && (
             <div className="fade-in">
+              <div className={`live-sync-status sync-${liveSyncStatus}`}>
+                <span className="live-sync-dot"></span>
+                <span>
+                  {liveSyncStatus === "online"
+                    ? `Datos en vivo · Actualizado ${new Date(lastLiveSync).toLocaleTimeString(
+                        "es-CR",
+                        {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        }
+                      )}`
+                    : liveSyncStatus === "offline"
+                      ? "Sin conexión en vivo · usando respaldo local"
+                      : "Conectando datos en vivo…"}
+                </span>
+              </div>
               <div className="cards">
                 <StatCard
                   icon={<Calendar className="text-primary" />}

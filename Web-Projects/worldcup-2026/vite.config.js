@@ -4,6 +4,15 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    proxy: {
+      "/api/live": {
+        target: "https://worldcup26.ir",
+        changeOrigin: true,
+        rewrite: () => "/get/games",
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({

@@ -213,6 +213,35 @@ body {
   margin-bottom: 8px;
 }
 
+.live-sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 7px 11px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  font-size: 11px;
+}
+
+.live-sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.sync-online .live-sync-dot {
+  background: var(--color-secondary);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+}
+
+.sync-offline .live-sync-dot {
+  background: var(--color-danger);
+}
+
 .stat-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
