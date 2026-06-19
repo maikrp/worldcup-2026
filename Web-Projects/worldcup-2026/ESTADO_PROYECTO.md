@@ -71,8 +71,8 @@ locales, visualizaciones y pronósticos estadísticos.
   necesitan como fuente.
 - Definir una estrategia de datos en vivo estable y manejo visible de errores de red.
 - Agregar `README.md` con instalación, arquitectura y comandos.
-- Configurar `VITE_SITE_URL` con el dominio público definitivo en producción para que WhatsApp y
-  Facebook resuelvan correctamente la tarjeta social.
+- Si se agrega un dominio personalizado, actualizar las URLs canónicas y sociales que actualmente
+  apuntan al dominio estable de Vercel.
 
 ## Nota de Git
 
