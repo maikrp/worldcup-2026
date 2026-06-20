@@ -1,8 +1,9 @@
-import { RATING_METADATA, teamStrengthSeeds } from "../constants/teamRatings.js";
+import { RATING_METADATA, teamRatingPoints } from "../constants/teamRatings.js";
 
 const AVERAGE_GOALS_PER_TEAM = 1.35;
 const MAX_GOALS = 8;
 const HOST_TEAMS = new Set(["Canadá", "Estados Unidos", "México"]);
+const DEFAULT_FIFA_POINTS = 1450;
 
 function factorial(value) {
   let result = 1;
@@ -14,13 +15,13 @@ function poissonProbability(goals, expectedGoals) {
   return (Math.exp(-expectedGoals) * expectedGoals ** goals) / factorial(goals);
 }
 
-function eloFromFifaRank(teamName) {
-  const rank = teamStrengthSeeds[teamName] || 50;
-  return 2050 - (rank - 1) * 12;
+function clamp(value, minimum, maximum) {
+  return Math.min(Math.max(value, minimum), maximum);
 }
 
 export function eloStrength(teamName) {
-  return 10 ** ((eloFromFifaRank(teamName) - 1800) / 400);
+  const fifaPoints = teamRatingPoints[teamName] || DEFAULT_FIFA_POINTS;
+  return 10 ** ((fifaPoints - 1500) / 400);
 }
 
 function tournamentStrength(stats) {
@@ -29,11 +30,29 @@ function tournamentStrength(stats) {
 
   const goalsForPerMatch = (stats.goals_for || 0) / played;
   const goalsAgainstPerMatch = (stats.goals_against || 0) / played;
-  const sampleWeight = Math.min(played / 5, 0.6);
+  const pointsPerMatch = (stats.points || 0) / played;
+  const goalDifferencePerMatch =
+    (stats.goal_difference ?? (stats.goals_for || 0) - (stats.goals_against || 0)) / played;
+  const sampleWeight = Math.min(played / 3, 0.72);
+  const resultFactor = clamp(
+    0.72 + (pointsPerMatch / 3) * 0.56 + goalDifferencePerMatch * 0.08,
+    0.65,
+    1.45
+  );
+  const attackSignal = clamp(
+    (goalsForPerMatch / AVERAGE_GOALS_PER_TEAM) * Math.sqrt(resultFactor),
+    0.45,
+    2.2
+  );
+  const defenseSignal = clamp(
+    goalsAgainstPerMatch / AVERAGE_GOALS_PER_TEAM / Math.sqrt(resultFactor),
+    0.45,
+    2.2
+  );
 
   return {
-    attack: 1 - sampleWeight + sampleWeight * (goalsForPerMatch / AVERAGE_GOALS_PER_TEAM),
-    defense: 1 - sampleWeight + sampleWeight * (goalsAgainstPerMatch / AVERAGE_GOALS_PER_TEAM),
+    attack: 1 - sampleWeight + sampleWeight * attackSignal,
+    defense: 1 - sampleWeight + sampleWeight * defenseSignal,
     sampleWeight,
   };
 }
@@ -44,8 +63,10 @@ function expectedGoalsFor(team, opponent) {
   const teamForm = tournamentStrength(team);
   const opponentForm = tournamentStrength(opponent);
   const venueBoost = HOST_TEAMS.has(team?.team_name) ? 1.08 : 1;
+  const averagePlayed = ((team?.played || 0) + (opponent?.played || 0)) / 2;
+  const ratingExponent = Math.max(0.22, 0.42 - averagePlayed * 0.08);
 
-  const ratingFactor = Math.sqrt(teamRating / opponentRating);
+  const ratingFactor = (teamRating / opponentRating) ** ratingExponent;
   const formFactor = Math.sqrt(teamForm.attack * opponentForm.defense);
   const expectedGoals = AVERAGE_GOALS_PER_TEAM * ratingFactor * formFactor * venueBoost;
 
