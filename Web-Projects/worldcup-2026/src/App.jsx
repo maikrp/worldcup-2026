@@ -31,7 +31,7 @@ import {
   getCostaRicaDateString,
   shiftCalendarDate,
 } from "./utils/dateTime";
-import { normalizeMatchStatuses } from "./utils/matchStatus";
+import { formatLiveMatchTime, normalizeMatchStatuses } from "./utils/matchStatus";
 import { calculateStandings } from "./utils/standings";
 
 export default function App() {
@@ -297,7 +297,9 @@ export default function App() {
                   }
                   sub={
                     liveMatch
-                      ? `${liveMatch.home_score ?? 0} - ${liveMatch.away_score ?? 0}`
+                      ? `${liveMatch.home_score ?? 0} - ${liveMatch.away_score ?? 0} · ${formatLiveMatchTime(
+                          liveMatch
+                        )}`
                       : nextMatch
                         ? `${nextMatchTime} CR · ${nextMatch.phase || nextMatch.round}`
                         : "No hay más partidos programados"
