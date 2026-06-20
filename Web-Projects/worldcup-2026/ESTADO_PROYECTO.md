@@ -27,8 +27,11 @@ tablas, goleadores, pronósticos y llaves.
 - Posiciones actuales mostradas como provisionales hasta que finalice cada grupo.
 - Detección de clasificados matemáticamente; México y Estados Unidos aparecen como clasificados con
   los resultados disponibles al 20 de junio.
-- Pronósticos mediante modelo de fuerza internacional, forma local y distribución Poisson.
+- Pronósticos mediante puntos FIFA reales para las 48 selecciones, forma local y distribución
+  Poisson.
 - Pronósticos con xG estimado, nivel de confianza, fuente y probabilidades que suman 100%.
+- El peso de los puntos FIFA disminuye conforme se juegan partidos; puntos por partido y diferencia
+  de gol ganan peso progresivamente.
 - Favoritos al título calculados mediante 5.000 simulaciones completas del torneo.
 - La simulación utiliza resultados finalizados, marcador y minuto en vivo, partidos pendientes,
   clasificación de grupos, mejores terceros, eliminatorias, prórroga y penales.
@@ -42,6 +45,8 @@ tablas, goleadores, pronósticos y llaves.
   Commons y respaldo genérico para jugadores todavía no identificados.
 - Minuto en vivo tomado de `time_elapsed` del proveedor; se eliminó la estimación basada en restar
   la hora de inicio y el valor artificial `90+2`.
+- El marcador destacado de Inicio muestra ahora marcador y minuto oficial (`74'`, `90+2'`,
+  `Descanso`, etc.).
 - Estados explícitos para descanso, tiempo extra, penales y finalizado.
 - Los partidos con datos remotos ya no cambian a “en vivo” únicamente porque su horario local haya
   pasado.
@@ -77,6 +82,8 @@ tablas, goleadores, pronósticos y llaves.
 - Salida principal: JavaScript gzip aproximado de 63.1 KB y CSS gzip aproximado de 6.2 KB.
 - PWA generada correctamente con 41 recursos precargados.
 - Prueba matemática: 5.000 simulaciones completadas y probabilidades de campeones sumando 100%.
+- Prueba ampliada: 20.000 simulaciones, 35 campeones distintos y menor concentración artificial;
+  Argentina 20.0%, Francia 17.7%, Inglaterra 11.8% y España 9.4%.
 - Prueba visual: la interfaz aparece inmediatamente y sustituye el estado de cálculo por los tres
   favoritos sin errores de consola.
 - Prueba visual: banderas colocadas sobre los nombres y horarios 11:00, 14:00, 18:00 y 22:00.
