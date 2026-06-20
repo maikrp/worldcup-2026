@@ -1,5 +1,14 @@
 export function getEffectiveMatchStatus(match, now = new Date()) {
-  if (match.hasLiveData) return match.status;
+  if (match.hasLiveData) {
+    const cachedAt = new Date(match.liveDataCachedAt).getTime();
+    const cacheIsOld = Number.isFinite(cachedAt) && now.getTime() - cachedAt > 4 * 60 * 60 * 1000;
+
+    if (match.status === "live" && cacheIsOld) {
+      return match.home_score !== null && match.away_score !== null ? "complete" : "scheduled";
+    }
+
+    return match.status;
+  }
 
   const kickoff = new Date(match.kickoff_utc);
   if (Number.isNaN(kickoff.getTime())) {

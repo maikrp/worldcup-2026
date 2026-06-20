@@ -24,7 +24,12 @@ import TopScorers from "./components/TopScorers";
 import { mockGroups, mockMatches } from "./constants/mockData";
 import { flagUrl, globalTeamCodes } from "./constants/teamCodes";
 import { buildTopScorers, fallbackTopScorers } from "./constants/topScorers";
-import { fetchLiveMatches, mergeLiveMatches } from "./services/liveMatches";
+import {
+  fetchLiveMatches,
+  loadCachedLiveMatches,
+  mergeLiveMatches,
+  saveCachedLiveMatches,
+} from "./services/liveMatches";
 import {
   COSTA_RICA_TIME_ZONE,
   formatCostaRicaTime,
@@ -35,6 +40,7 @@ import { formatLiveMatchLabel, normalizeMatchStatuses } from "./utils/matchStatu
 import { calculateStandings } from "./utils/standings";
 
 export default function App() {
+  const [initialLiveSnapshot] = useState(() => loadCachedLiveMatches());
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,9 +49,11 @@ export default function App() {
   const [matchDateFilter, setMatchDateFilter] = useState("");
   const [currentTime] = useState(() => Date.now());
   const [statusClock, setStatusClock] = useState(() => Date.now());
-  const [remoteMatches, setRemoteMatches] = useState([]);
-  const [lastLiveSync, setLastLiveSync] = useState(null);
-  const [liveSyncStatus, setLiveSyncStatus] = useState("connecting");
+  const [remoteMatches, setRemoteMatches] = useState(() => initialLiveSnapshot?.matches || []);
+  const [lastLiveSync, setLastLiveSync] = useState(() => initialLiveSnapshot?.syncedAt || null);
+  const [liveSyncStatus, setLiveSyncStatus] = useState(() =>
+    initialLiveSnapshot ? "stale" : "connecting"
+  );
   const [titleSimulation, setTitleSimulation] = useState({
     iterations: 0,
     probabilities: [],
@@ -94,6 +102,7 @@ export default function App() {
 
       try {
         const liveData = await fetchLiveMatches(activeController.signal);
+        saveCachedLiveMatches(liveData);
         setRemoteMatches(liveData.matches);
         setLastLiveSync(liveData.syncedAt || new Date().toISOString());
         setLiveSyncStatus("online");

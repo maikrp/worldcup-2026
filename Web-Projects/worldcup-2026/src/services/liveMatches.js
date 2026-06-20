@@ -53,6 +53,9 @@ const TEAM_NAMES = {
   "DR Congo": "Congo RD",
 };
 
+const LIVE_MATCHES_CACHE_KEY = "worldcup-2026:live-matches:v1";
+const CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
+
 function parseScore(value) {
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) ? parsed : null;
@@ -68,6 +71,49 @@ function mapStatus(game) {
 
 function normalizeName(name) {
   return TEAM_NAMES[name] || name;
+}
+
+export function loadCachedLiveMatches() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const cached = JSON.parse(window.localStorage.getItem(LIVE_MATCHES_CACHE_KEY));
+    const savedAt = new Date(cached?.savedAt).getTime();
+    if (!Array.isArray(cached?.matches) || !Number.isFinite(savedAt)) return null;
+    if (Date.now() - savedAt > CACHE_MAX_AGE) {
+      window.localStorage.removeItem(LIVE_MATCHES_CACHE_KEY);
+      return null;
+    }
+
+    return {
+      matches: cached.matches.map((match) => ({
+        ...match,
+        cachedAt: cached.savedAt,
+      })),
+      syncedAt: cached.syncedAt || cached.savedAt,
+      savedAt: cached.savedAt,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function saveCachedLiveMatches(liveData) {
+  if (typeof window === "undefined" || !liveData?.matches?.length) return;
+
+  try {
+    const savedAt = new Date().toISOString();
+    window.localStorage.setItem(
+      LIVE_MATCHES_CACHE_KEY,
+      JSON.stringify({
+        savedAt,
+        syncedAt: liveData.syncedAt || savedAt,
+        matches: liveData.matches,
+      })
+    );
+  } catch {
+    // La aplicación continúa en memoria si el navegador bloquea el almacenamiento.
+  }
 }
 
 export async function fetchLiveMatches(signal) {
@@ -134,6 +180,7 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
       time_elapsed: remote.time_elapsed,
       home_scorers: remote.home_scorers,
       away_scorers: remote.away_scorers,
+      liveDataCachedAt: remote.cachedAt,
       hasLiveData: true,
     };
   });
