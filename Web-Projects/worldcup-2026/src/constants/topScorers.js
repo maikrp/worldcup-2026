@@ -1,4 +1,112 @@
-export const topScorers = [
+import { globalTeamCodes } from "./teamCodes";
+
+const PLAYER_NAMES = {
+  "C. Larin": "Cyle Larin",
+  "F. Balogun": "Folarin Balogun",
+  "Jvhan Mnzambi": "Johan Manzambi",
+  "K. Havertz": "Kai Havertz",
+  "K. Mbappé": "Kylian Mbappé",
+  "Kail Larin": "Cyle Larin",
+  "H. Kane": "Harry Kane",
+  "V. Júnior": "Vinícius Júnior",
+  "Y.Ayari": "Yasin Ayari",
+};
+
+const KNOWN_OWN_GOALS = new Set([
+  "Aymen Hussein|Noruega",
+  "D. Bobadilla|Estados Unidos",
+  "Kamrvn Bargs|Estados Unidos",
+  "Mohamed Almnai|Canadá",
+  "Mohamed Hany|Bélgica",
+]);
+
+const PLAYER_PHOTOS = {
+  "Kylian Mbappé": "/players/mbappe.webp",
+  "Harry Kane": "/players/kane.webp",
+  "Lionel Messi": "/players/messi.webp",
+};
+
+function parseScorerEvents(rawScorers) {
+  if (!rawScorers || rawScorers === "null") return [];
+  if (Array.isArray(rawScorers)) return rawScorers;
+
+  return String(rawScorers)
+    .replace(/^\{|\}$/g, "")
+    .split(",")
+    .map((value) => value.trim().replace(/^["“”]+|["“”]+$/g, ""))
+    .filter(Boolean);
+}
+
+function parseScorer(value) {
+  const ownGoal = /\(OG\)/i.test(value);
+  const minuteMatch = value.match(/(\d+(?:'\+\d+|\+\d+)?')/);
+  const minute = minuteMatch?.[1] || "";
+  const rawName = value
+    .replace(minuteMatch?.[0] || "", "")
+    .replace(/\((?:p|OG)\)/gi, "")
+    .trim();
+
+  return {
+    name: PLAYER_NAMES[rawName] || rawName,
+    minute,
+    ownGoal,
+  };
+}
+
+export function buildTopScorers(matches) {
+  const players = new Map();
+
+  matches
+    .filter((match) => match.status === "complete" || match.status === "live")
+    .forEach((match) => {
+      [
+        [match.home_team, match.away_team, match.home_scorers],
+        [match.away_team, match.home_team, match.away_scorers],
+      ].forEach(([team, opponent, rawScorers]) => {
+        parseScorerEvents(rawScorers).forEach((rawScorer) => {
+          const scorer = parseScorer(rawScorer);
+          if (!scorer.name || scorer.ownGoal || KNOWN_OWN_GOALS.has(`${scorer.name}|${team}`)) {
+            return;
+          }
+
+          const key = `${scorer.name}|${team}`;
+          const current = players.get(key) || {
+            name: scorer.name,
+            team,
+            teamCode: globalTeamCodes[team] || "un",
+            goals: 0,
+            scoringMatches: new Set(),
+            photo: PLAYER_PHOTOS[scorer.name] || "/players/player-fallback.webp",
+            goalEvents: [],
+          };
+
+          current.goals += 1;
+          current.scoringMatches.add(match.id);
+          current.goalEvents.push({
+            opponent,
+            date: match.kickoff_utc.slice(0, 10),
+            result: `${match.home_score ?? 0}–${match.away_score ?? 0}`,
+            minute: scorer.minute || "—",
+          });
+          players.set(key, current);
+        });
+      });
+    });
+
+  return [...players.values()]
+    .map((player) => ({
+      ...player,
+      scoringMatches: player.scoringMatches.size,
+    }))
+    .sort(
+      (a, b) =>
+        b.goals - a.goals ||
+        a.scoringMatches - b.scoringMatches ||
+        a.name.localeCompare(b.name, "es")
+    );
+}
+
+export const fallbackTopScorers = [
   {
     name: "Kylian Mbappé",
     team: "Francia",

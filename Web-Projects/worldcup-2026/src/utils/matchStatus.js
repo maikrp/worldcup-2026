@@ -1,26 +1,30 @@
-const LIVE_MATCH_WINDOW_MINUTES = 135;
-
 export function getEffectiveMatchStatus(match, now = new Date()) {
+  if (match.hasLiveData) return match.status;
+
   const kickoff = new Date(match.kickoff_utc);
   if (Number.isNaN(kickoff.getTime())) {
     return match.status;
   }
 
-  const elapsedMinutes = (now.getTime() - kickoff.getTime()) / 60000;
-
-  if (
-    match.status === "scheduled" &&
-    elapsedMinutes >= 0 &&
-    elapsedMinutes < LIVE_MATCH_WINDOW_MINUTES
-  ) {
-    return "live";
-  }
-
-  if (match.status === "live" && elapsedMinutes >= LIVE_MATCH_WINDOW_MINUTES) {
+  if (match.status === "live" && now.getTime() - kickoff.getTime() > 6 * 60 * 60 * 1000) {
     return match.home_score !== null && match.away_score !== null ? "complete" : "scheduled";
   }
 
   return match.status;
+}
+
+export function formatLiveMatchTime(match) {
+  const rawValue = String(match.time_elapsed ?? "").trim();
+  const normalizedValue = rawValue.toLowerCase();
+
+  if (!rawValue || normalizedValue === "notstarted") return "En vivo";
+  if (normalizedValue === "finished") return "Finalizado";
+  if (["halftime", "half-time", "ht", "break"].includes(normalizedValue)) return "Descanso";
+  if (["extra_time", "extra time", "et"].includes(normalizedValue)) return "Tiempo extra";
+  if (["penalties", "penalty", "pens"].includes(normalizedValue)) return "Penales";
+
+  const minuteMatch = rawValue.match(/\d{1,3}(?:\+\d{1,2})?/);
+  return minuteMatch ? `${minuteMatch[0]}'` : "En vivo";
 }
 
 export function normalizeMatchStatuses(matches, now = new Date()) {

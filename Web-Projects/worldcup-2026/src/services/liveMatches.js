@@ -71,21 +71,30 @@ function normalizeName(name) {
 }
 
 export async function fetchLiveMatches(signal) {
-  const sources = ["https://worldcup26.ir/get/games", "/api/live"];
+  const sources = ["/api/live"];
   let payload;
 
   for (const source of sources) {
+    const timeoutController = new AbortController();
+    const timeoutId = window.setTimeout(() => timeoutController.abort(), 28000);
+    const abortRequest = () => timeoutController.abort();
+    signal?.addEventListener("abort", abortRequest, { once: true });
+
     try {
       const response = await fetch(source, {
-        signal,
+        signal: timeoutController.signal,
         headers: { Accept: "application/json" },
+        cache: "no-store",
       });
 
       if (!response.ok) continue;
       payload = await response.json();
       break;
     } catch (error) {
-      if (error.name === "AbortError") throw error;
+      if (signal?.aborted) throw error;
+    } finally {
+      window.clearTimeout(timeoutId);
+      signal?.removeEventListener("abort", abortRequest);
     }
   }
 
@@ -103,6 +112,7 @@ export async function fetchLiveMatches(signal) {
       time_elapsed: game.time_elapsed,
       home_scorers: game.home_scorers,
       away_scorers: game.away_scorers,
+      remoteLocalDate: game.local_date,
     })),
   };
 }
@@ -124,6 +134,7 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
       time_elapsed: remote.time_elapsed,
       home_scorers: remote.home_scorers,
       away_scorers: remote.away_scorers,
+      hasLiveData: true,
     };
   });
 }

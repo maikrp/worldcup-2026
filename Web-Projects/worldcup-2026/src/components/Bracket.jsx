@@ -1,77 +1,136 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
-// Proyección del formato de eliminación del Mundial 2026.
-// 48 teams, 12 groups → Round of 32 (16 matches) → Round of 16 → QF → SF → Final
+const R32_MATCHES = [
+  { id: "M73", t1: ["group", "A", 2], t2: ["group", "B", 2] },
+  { id: "M74", t1: ["group", "E", 1], t2: ["third", "A/B/C/D/F"] },
+  { id: "M75", t1: ["group", "F", 1], t2: ["group", "C", 2] },
+  { id: "M76", t1: ["group", "C", 1], t2: ["group", "F", 2] },
+  { id: "M77", t1: ["group", "I", 1], t2: ["third", "C/D/F/G/H"] },
+  { id: "M78", t1: ["group", "E", 2], t2: ["group", "I", 2] },
+  { id: "M79", t1: ["group", "A", 1], t2: ["third", "C/E/F/H/I"] },
+  { id: "M80", t1: ["group", "L", 1], t2: ["third", "E/H/I/J/K"] },
+  { id: "M81", t1: ["group", "D", 1], t2: ["third", "B/E/F/I/J"] },
+  { id: "M82", t1: ["group", "G", 1], t2: ["third", "A/E/H/I/J"] },
+  { id: "M83", t1: ["group", "K", 2], t2: ["group", "L", 2] },
+  { id: "M84", t1: ["group", "H", 1], t2: ["group", "J", 2] },
+  { id: "M85", t1: ["group", "B", 1], t2: ["third", "E/F/G/I/J"] },
+  { id: "M86", t1: ["group", "J", 1], t2: ["group", "H", 2] },
+  { id: "M87", t1: ["group", "K", 1], t2: ["third", "D/E/I/J/L"] },
+  { id: "M88", t1: ["group", "D", 2], t2: ["group", "G", 2] },
+];
 
-const BRACKET_STRUCTURE = {
-  // Los cruces son una visualización simplificada. No sustituyen el bracket oficial.
-  rounds: [
-    {
-      id: "r32",
-      label: "Ronda de 32",
-      matchCount: 16,
-      matches: [
-        { id: "R32-1", t1: "1° Grupo A", t2: "3° Mejor", s1: null, s2: null },
-        { id: "R32-2", t1: "1° Grupo B", t2: "3° Mejor", s1: null, s2: null },
-        { id: "R32-3", t1: "1° Grupo C", t2: "3° Mejor", s1: null, s2: null },
-        { id: "R32-4", t1: "1° Grupo D", t2: "3° Mejor", s1: null, s2: null },
-        { id: "R32-5", t1: "1° Grupo E", t2: "2° Grupo J", s1: null, s2: null },
-        { id: "R32-6", t1: "1° Grupo F", t2: "2° Grupo K", s1: null, s2: null },
-        { id: "R32-7", t1: "1° Grupo G", t2: "2° Grupo L", s1: null, s2: null },
-        { id: "R32-8", t1: "1° Grupo H", t2: "2° Grupo I", s1: null, s2: null },
-        { id: "R32-9", t1: "1° Grupo I", t2: "2° Grupo H", s1: null, s2: null },
-        { id: "R32-10", t1: "1° Grupo J", t2: "2° Grupo G", s1: null, s2: null },
-        { id: "R32-11", t1: "1° Grupo K", t2: "2° Grupo F", s1: null, s2: null },
-        { id: "R32-12", t1: "1° Grupo L", t2: "2° Grupo E", s1: null, s2: null },
-        { id: "R32-13", t1: "2° Grupo A", t2: "2° Grupo D", s1: null, s2: null },
-        { id: "R32-14", t1: "2° Grupo B", t2: "2° Grupo C", s1: null, s2: null },
-        { id: "R32-15", t1: "3° Mejor", t2: "3° Mejor", s1: null, s2: null },
-        { id: "R32-16", t1: "3° Mejor", t2: "3° Mejor", s1: null, s2: null },
-      ],
-    },
-    {
-      id: "r16",
-      label: "Octavos de Final",
-      matchCount: 8,
-      matches: [
-        { id: "R16-1", t1: "Gan. R32-1", t2: "Gan. R32-2", s1: null, s2: null },
-        { id: "R16-2", t1: "Gan. R32-3", t2: "Gan. R32-4", s1: null, s2: null },
-        { id: "R16-3", t1: "Gan. R32-5", t2: "Gan. R32-6", s1: null, s2: null },
-        { id: "R16-4", t1: "Gan. R32-7", t2: "Gan. R32-8", s1: null, s2: null },
-        { id: "R16-5", t1: "Gan. R32-9", t2: "Gan. R32-10", s1: null, s2: null },
-        { id: "R16-6", t1: "Gan. R32-11", t2: "Gan. R32-12", s1: null, s2: null },
-        { id: "R16-7", t1: "Gan. R32-13", t2: "Gan. R32-14", s1: null, s2: null },
-        { id: "R16-8", t1: "Gan. R32-15", t2: "Gan. R32-16", s1: null, s2: null },
-      ],
-    },
-    {
-      id: "qf",
-      label: "Cuartos de Final",
-      matchCount: 4,
-      matches: [
-        { id: "QF-1", t1: "Gan. R16-1", t2: "Gan. R16-2", s1: null, s2: null },
-        { id: "QF-2", t1: "Gan. R16-3", t2: "Gan. R16-4", s1: null, s2: null },
-        { id: "QF-3", t1: "Gan. R16-5", t2: "Gan. R16-6", s1: null, s2: null },
-        { id: "QF-4", t1: "Gan. R16-7", t2: "Gan. R16-8", s1: null, s2: null },
-      ],
-    },
-    {
-      id: "sf",
-      label: "Semifinales",
-      matchCount: 2,
-      matches: [
-        { id: "SF-1", t1: "Gan. QF-1", t2: "Gan. QF-2", s1: null, s2: null },
-        { id: "SF-2", t1: "Gan. QF-3", t2: "Gan. QF-4", s1: null, s2: null },
-      ],
-    },
-    {
-      id: "final",
-      label: "Final",
-      matchCount: 1,
-      matches: [{ id: "FINAL", t1: "Gan. SF-1", t2: "Gan. SF-2", s1: null, s2: null }],
-    },
-  ],
-};
+const LATER_ROUNDS = [
+  {
+    id: "r16",
+    label: "Octavos de Final",
+    matches: [
+      ["M89", "Gan. M73", "Gan. M75"],
+      ["M90", "Gan. M74", "Gan. M77"],
+      ["M91", "Gan. M76", "Gan. M78"],
+      ["M92", "Gan. M79", "Gan. M80"],
+      ["M93", "Gan. M83", "Gan. M84"],
+      ["M94", "Gan. M81", "Gan. M82"],
+      ["M95", "Gan. M86", "Gan. M88"],
+      ["M96", "Gan. M85", "Gan. M87"],
+    ],
+  },
+  {
+    id: "qf",
+    label: "Cuartos de Final",
+    matches: [
+      ["M97", "Gan. M89", "Gan. M90"],
+      ["M98", "Gan. M93", "Gan. M94"],
+      ["M99", "Gan. M91", "Gan. M92"],
+      ["M100", "Gan. M95", "Gan. M96"],
+    ],
+  },
+  {
+    id: "sf",
+    label: "Semifinales",
+    matches: [
+      ["M101", "Gan. M97", "Gan. M98"],
+      ["M102", "Gan. M99", "Gan. M100"],
+    ],
+  },
+  {
+    id: "medal",
+    label: "Partidos por medalla",
+    matches: [
+      ["M103", "Perd. M101", "Perd. M102"],
+      ["M104", "Gan. M101", "Gan. M102"],
+    ],
+  },
+].map((round) => ({
+  ...round,
+  matches: round.matches.map(([id, t1, t2]) => ({ id, t1, t2 })),
+}));
+
+function resolveSlot(slot, groups) {
+  if (slot[0] === "third") return `Mejor 3.º (${slot[1]})`;
+
+  const [, groupName, position] = slot;
+  const group = groups.find((item) => item.name === groupName);
+  const team = group?.standings[position - 1]?.team_name;
+  return team
+    ? `${team} · ${position}.º ${groupName} provisional`
+    : `${position}.º Grupo ${groupName}`;
+}
+
+function enumerateRemainingPoints(basePoints, remainingMatches, callback, index = 0) {
+  if (index === remainingMatches.length) {
+    callback(basePoints);
+    return;
+  }
+
+  const match = remainingMatches[index];
+  const outcomes = [
+    [3, 0],
+    [1, 1],
+    [0, 3],
+  ];
+
+  outcomes.forEach(([homePoints, awayPoints]) => {
+    const nextPoints = new Map(basePoints);
+    nextPoints.set(match.home_team, (nextPoints.get(match.home_team) || 0) + homePoints);
+    nextPoints.set(match.away_team, (nextPoints.get(match.away_team) || 0) + awayPoints);
+    enumerateRemainingPoints(nextPoints, remainingMatches, callback, index + 1);
+  });
+}
+
+function getGuaranteedQualifiers(groups, matches) {
+  return groups.flatMap((group) => {
+    const teamNames = new Set(group.standings.map((team) => team.team_name));
+    const remainingMatches = matches.filter(
+      (match) =>
+        match.status !== "complete" &&
+        teamNames.has(match.home_team) &&
+        teamNames.has(match.away_team)
+    );
+
+    if (remainingMatches.length === 0) {
+      return group.standings.slice(0, 2).map((team) => team.team_name);
+    }
+
+    const basePoints = new Map(group.standings.map((team) => [team.team_name, team.points]));
+
+    return group.standings
+      .filter((team) => {
+        let guaranteed = true;
+        enumerateRemainingPoints(basePoints, remainingMatches, (scenario) => {
+          if (!guaranteed) return;
+          const teamPoints = scenario.get(team.team_name) || 0;
+          const rivalsAtOrAbove = group.standings.filter(
+            (rival) =>
+              rival.team_name !== team.team_name &&
+              (scenario.get(rival.team_name) || 0) >= teamPoints
+          ).length;
+          if (rivalsAtOrAbove >= 2) guaranteed = false;
+        });
+        return guaranteed;
+      })
+      .map((team) => team.team_name);
+  });
+}
 
 function MatchBox({ match, isHighlighted }) {
   return (
@@ -79,25 +138,42 @@ function MatchBox({ match, isHighlighted }) {
       <div className="bracket-match-id">{match.id}</div>
       <div className="bracket-team">
         <span>{match.t1}</span>
-        <strong className="bracket-score">{match.s1 !== null ? match.s1 : "—"}</strong>
+        <strong className="bracket-score">—</strong>
       </div>
       <div className="bracket-team separator">
         <span>{match.t2}</span>
-        <strong className="bracket-score">{match.s2 !== null ? match.s2 : "—"}</strong>
+        <strong className="bracket-score">—</strong>
       </div>
     </div>
   );
 }
 
-export default function Bracket() {
+export default function Bracket({ groups = [], matches = [] }) {
   const [activeRound, setActiveRound] = useState("all");
-  const rounds = BRACKET_STRUCTURE.rounds;
+  const guaranteedQualifiers = useMemo(
+    () => getGuaranteedQualifiers(groups, matches),
+    [groups, matches]
+  );
+  const rounds = useMemo(
+    () => [
+      {
+        id: "r32",
+        label: "Ronda de 32",
+        matches: R32_MATCHES.map((match) => ({
+          ...match,
+          t1: resolveSlot(match.t1, groups),
+          t2: resolveSlot(match.t2, groups),
+        })),
+      },
+      ...LATER_ROUNDS,
+    ],
+    [groups]
+  );
 
   const visibleRounds = activeRound === "all" ? rounds : rounds.filter((r) => r.id === activeRound);
 
   return (
     <div className="bracket-container">
-      {/* Round filter tabs */}
       <div className="bracket-round-tabs">
         <button
           className={`bracket-tab${activeRound === "all" ? " active" : ""}`}
@@ -105,21 +181,27 @@ export default function Bracket() {
         >
           Todos
         </button>
-        {rounds.map((r) => (
+        {rounds.map((round) => (
           <button
-            key={r.id}
-            className={`bracket-tab${activeRound === r.id ? " active" : ""}`}
-            onClick={() => setActiveRound(r.id)}
+            key={round.id}
+            className={`bracket-tab${activeRound === round.id ? " active" : ""}`}
+            onClick={() => setActiveRound(round.id)}
           >
-            {r.label}
+            {round.label}
           </button>
         ))}
       </div>
 
       <div className="bracket-info-banner">
-        <span>⚽ Proyección del formato — 48 equipos / 12 grupos</span>
-        <span className="bracket-info-pill">Ronda de 32 → Octavos → Cuartos → Semis → Final</span>
+        <span>⚽ Cruces oficiales FIFA · posiciones actuales provisionales</span>
+        <span className="bracket-info-pill">12 primeros + 12 segundos + 8 mejores terceros</span>
       </div>
+
+      <p className="scorers-note">
+        Clasificados matemáticamente:{" "}
+        {guaranteedQualifiers.length ? guaranteedQualifiers.join(", ") : "ninguno todavía"}. Los
+        mejores terceros se asignan al finalizar los grupos según la combinación oficial.
+      </p>
 
       {activeRound === "all" && (
         <p className="bracket-scroll-hint" aria-hidden="true">
@@ -130,7 +212,7 @@ export default function Bracket() {
       <div
         className="bracket-wrapper"
         role="region"
-        aria-label="Llaves del torneo; desplázate horizontalmente para ver todas las rondas"
+        aria-label="Llaves oficiales proyectadas con las posiciones actuales"
         tabIndex="0"
       >
         <div className={`bracket${activeRound === "all" ? " bracket-full" : " bracket-single"}`}>
@@ -138,11 +220,11 @@ export default function Bracket() {
             <div className="round" key={round.id}>
               <div className="round-title">
                 {round.label}
-                <span className="round-count">({round.matchCount} partidos)</span>
+                <span className="round-count">({round.matches.length} partidos)</span>
               </div>
               <div className="bracket-matches">
                 {round.matches.map((match) => (
-                  <MatchBox key={match.id} match={match} isHighlighted={round.id === "final"} />
+                  <MatchBox key={match.id} match={match} isHighlighted={match.id === "M104"} />
                 ))}
               </div>
             </div>

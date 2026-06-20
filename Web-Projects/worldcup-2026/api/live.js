@@ -4,6 +4,8 @@ export default async function handler(_request, response) {
   try {
     const sourceResponse = await fetch(SOURCE_URL, {
       headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(26000),
+      cache: "no-store",
     });
 
     if (!sourceResponse.ok) {

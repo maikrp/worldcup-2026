@@ -23,8 +23,9 @@ import TopScorers from "./components/TopScorers";
 // Constants & Data
 import { mockGroups, mockMatches } from "./constants/mockData";
 import { flagUrl, globalTeamCodes } from "./constants/teamCodes";
-import { topScorers } from "./constants/topScorers";
+import { buildTopScorers, fallbackTopScorers } from "./constants/topScorers";
 import { fetchLiveMatches, mergeLiveMatches } from "./services/liveMatches";
+import { COSTA_RICA_TIME_ZONE, getCostaRicaDateString, shiftCalendarDate } from "./utils/dateTime";
 import { normalizeMatchStatuses } from "./utils/matchStatus";
 import { calculateStandings } from "./utils/standings";
 
@@ -32,7 +33,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDate, setSelectedDate] = useState("2026-06-19");
+  const [selectedDate, setSelectedDate] = useState(() => getCostaRicaDateString());
   const [sortOrder, setSortOrder] = useState("asc");
   const [matchDateFilter, setMatchDateFilter] = useState("");
   const [currentTime] = useState(() => Date.now());
@@ -44,6 +45,7 @@ export default function App() {
     mergeLiveMatches(mockMatches, remoteMatches),
     new Date(statusClock)
   );
+  const topScorers = remoteMatches.length ? buildTopScorers(matches) : fallbackTopScorers;
   const groups = calculateStandings(mockGroups, matches);
 
   useEffect(() => {
@@ -65,12 +67,16 @@ export default function App() {
         setLiveSyncStatus("online");
         setStatusClock(Date.now());
       } catch (error) {
-        if (error.name !== "AbortError") setLiveSyncStatus("offline");
+        if (error.name !== "AbortError") {
+          setLiveSyncStatus((currentStatus) =>
+            currentStatus === "online" || currentStatus === "stale" ? "stale" : "offline"
+          );
+        }
       }
     };
 
     synchronizeLiveMatches();
-    const intervalId = window.setInterval(synchronizeLiveMatches, 30000);
+    const intervalId = window.setInterval(synchronizeLiveMatches, 60000);
 
     return () => {
       window.clearInterval(intervalId);
@@ -87,7 +93,7 @@ export default function App() {
 
   const nextMatchTime = nextMatch
     ? new Intl.DateTimeFormat("es-CR", {
-        timeZone: "America/Costa_Rica",
+        timeZone: COSTA_RICA_TIME_ZONE,
         hour: "numeric",
         minute: "2-digit",
       }).format(new Date(nextMatch.kickoff_utc))
@@ -95,15 +101,11 @@ export default function App() {
   const featuredMatch = liveMatch || nextMatch;
 
   const handlePrevDay = () => {
-    const current = new Date(selectedDate + "T00:00:00");
-    current.setDate(current.getDate() - 1);
-    setSelectedDate(current.toISOString().split("T")[0]);
+    setSelectedDate((currentDate) => shiftCalendarDate(currentDate, -1));
   };
 
   const handleNextDay = () => {
-    const current = new Date(selectedDate + "T00:00:00");
-    current.setDate(current.getDate() + 1);
-    setSelectedDate(current.toISOString().split("T")[0]);
+    setSelectedDate((currentDate) => shiftCalendarDate(currentDate, 1));
   };
 
   const filteredMatches = matches.filter((m) => {
@@ -111,18 +113,7 @@ export default function App() {
 
     let matchCRDate = "";
     try {
-      const date = new Date(m.kickoff_utc);
-      const formatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/Costa_Rica",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
-      const parts = formatter.formatToParts(date);
-      const year = parts.find((p) => p.type === "year").value;
-      const month = parts.find((p) => p.type === "month").value;
-      const day = parts.find((p) => p.type === "day").value;
-      matchCRDate = `${year}-${month}-${day}`;
+      matchCRDate = getCostaRicaDateString(m.kickoff_utc);
     } catch {
       matchCRDate = m.kickoff_utc.split("T")[0];
     }
@@ -220,7 +211,15 @@ export default function App() {
                       )}`
                     : liveSyncStatus === "offline"
                       ? "Sin conexión en vivo · usando respaldo local"
-                      : "Conectando datos en vivo…"}
+                      : liveSyncStatus === "stale"
+                        ? `Datos guardados · última actualización ${new Date(
+                            lastLiveSync
+                          ).toLocaleTimeString("es-CR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          })}`
+                        : "Conectando datos en vivo…"}
                 </span>
               </div>
               <div className="cards">
@@ -378,7 +377,7 @@ export default function App() {
           {activeTab === "bracket" && (
             <div className="fade-in">
               <h2>Bracket de Avance Mundial 2026</h2>
-              <Bracket />
+              <Bracket groups={groups} matches={matches} />
             </div>
           )}
 

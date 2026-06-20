@@ -2,19 +2,8 @@ import React from "react";
 import { MapPin, Clock } from "lucide-react";
 import { globalTeamCodes as teamCodes, flagUrl } from "../constants/teamCodes";
 import { predictMatch } from "../utils/prediction";
-
-function getLiveMinute(kickoffUtc) {
-  try {
-    const diffMs = new Date() - new Date(kickoffUtc);
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 0) return "1'";
-    if (diffMins > 90) return "90+2'";
-    if (diffMins > 45 && diffMins < 60) return "Int.";
-    return `${diffMins}'`;
-  } catch {
-    return "15'";
-  }
-}
+import { COSTA_RICA_TIME_ZONE } from "../utils/dateTime";
+import { formatLiveMatchTime } from "../utils/matchStatus";
 
 export default function MatchGrid({ matches, groups }) {
   if (matches.length === 0) {
@@ -45,7 +34,7 @@ export default function MatchGrid({ matches, groups }) {
               {m.status === "complete" ? (
                 <span className="status-badge complete">Finalizado</span>
               ) : m.status === "live" ? (
-                <span className="status-badge live">Vivo {getLiveMinute(m.kickoff_utc)}</span>
+                <span className="status-badge live">{formatLiveMatchTime(m)}</span>
               ) : (
                 <span className="status-badge live-blink">Programado</span>
               )}
@@ -105,11 +94,15 @@ export default function MatchGrid({ matches, groups }) {
               <div className="info-item">
                 <Clock size={12} />
                 <span>
-                  {new Date(m.kickoff_utc).toLocaleString("es-CR", {
-                    timeZone: "America/Costa_Rica",
-                    dateStyle: "short",
-                    timeStyle: "short",
-                  })}
+                  {m.time_confirmed === false
+                    ? `${new Date(m.kickoff_utc).toLocaleDateString("es-CR", {
+                        timeZone: COSTA_RICA_TIME_ZONE,
+                      })} · Hora por confirmar`
+                    : `${new Date(m.kickoff_utc).toLocaleString("es-CR", {
+                        timeZone: COSTA_RICA_TIME_ZONE,
+                        dateStyle: "short",
+                        timeStyle: "short",
+                      })} CR`}
                 </span>
               </div>
             </div>

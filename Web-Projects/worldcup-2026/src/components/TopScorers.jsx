@@ -5,7 +5,10 @@ import { flagUrl } from "../constants/teamCodes";
 export default function TopScorers({ scorers }) {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const rankedScorers = [...scorers].sort(
-    (a, b) => b.goals - a.goals || b.assists - a.assists || a.minutes - b.minutes
+    (a, b) =>
+      b.goals - a.goals ||
+      (a.scoringMatches ?? a.matches) - (b.scoringMatches ?? b.matches) ||
+      a.name.localeCompare(b.name, "es")
   );
 
   useEffect(() => {
@@ -27,12 +30,10 @@ export default function TopScorers({ scorers }) {
             <Award size={16} /> Clasificación individual
           </span>
           <h2>Goleadores de la simulación</h2>
-          <p>
-            Ordenados por goles, asistencias y menos minutos disputados como criterios de desempate.
-          </p>
+          <p>Calculados desde los eventos de gol recibidos en la sincronización de partidos.</p>
         </div>
         <span className="data-source-badge">
-          <ShieldCheck size={15} /> Datos internos · No oficial
+          <ShieldCheck size={15} /> Fuente en vivo · No oficial
         </span>
       </div>
 
@@ -43,10 +44,8 @@ export default function TopScorers({ scorers }) {
               <th>Pos.</th>
               <th>Jugador</th>
               <th>Selección</th>
-              <th className="txt-center">PJ</th>
               <th className="txt-center">Goles</th>
-              <th className="txt-center">Asist.</th>
-              <th className="txt-center">Min.</th>
+              <th className="txt-center">Partidos con gol</th>
               <th className="txt-center">Prom.</th>
             </tr>
           </thead>
@@ -80,7 +79,6 @@ export default function TopScorers({ scorers }) {
                     <span>{player.team}</span>
                   </div>
                 </td>
-                <td className="txt-center">{player.matches}</td>
                 <td className="txt-center">
                   <button
                     type="button"
@@ -91,13 +89,14 @@ export default function TopScorers({ scorers }) {
                     <Goal size={15} /> {player.goals}
                   </button>
                 </td>
-                <td className="txt-center">{player.assists}</td>
                 <td className="txt-center">
                   <span className="minutes-cell">
-                    <Clock3 size={14} /> {player.minutes}
+                    <Clock3 size={14} /> {player.scoringMatches ?? player.matches}
                   </span>
                 </td>
-                <td className="txt-center">{(player.goals / player.matches).toFixed(2)}</td>
+                <td className="txt-center">
+                  {(player.goals / (player.scoringMatches ?? player.matches)).toFixed(2)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -105,8 +104,8 @@ export default function TopScorers({ scorers }) {
       </div>
 
       <p className="scorers-note">
-        Esta tabla es demostrativa y no representa la clasificación oficial de FIFA. La aplicación
-        no tiene conectado un proveedor oficial de estadísticas individuales en tiempo real.
+        La tabla se genera desde los anotadores informados por el proveedor de resultados. No es una
+        clasificación oficial de FIFA y puede reflejar correcciones pendientes de la fuente.
       </p>
 
       {selectedPlayer && (

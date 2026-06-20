@@ -2,38 +2,8 @@ import React from "react";
 import { Clock, Calendar } from "lucide-react";
 import { globalTeamCodes as teamCodes, flagUrl } from "../constants/teamCodes";
 import { predictMatch } from "../utils/prediction";
-
-function getCostaRicaDateString(kickoffUtc) {
-  try {
-    const date = new Date(kickoffUtc);
-    const formatter = new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/Costa_Rica",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    const parts = formatter.formatToParts(date);
-    const year = parts.find((p) => p.type === "year").value;
-    const month = parts.find((p) => p.type === "month").value;
-    const day = parts.find((p) => p.type === "day").value;
-    return `${year}-${month}-${day}`;
-  } catch {
-    return kickoffUtc.split("T")[0];
-  }
-}
-
-function getLiveMinute(kickoffUtc) {
-  try {
-    const diffMs = new Date() - new Date(kickoffUtc);
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 0) return "1'";
-    if (diffMins > 90) return "90+2'";
-    if (diffMins > 45 && diffMins < 60) return "Int.";
-    return `${diffMins}'`;
-  } catch {
-    return "15'";
-  }
-}
+import { formatCostaRicaTime, getCostaRicaDateString } from "../utils/dateTime";
+import { formatLiveMatchTime } from "../utils/matchStatus";
 
 export default function DailyMatchSection({ matches, groups, selectedDate, onPrevDay, onNextDay }) {
   const dailyMatches = matches
@@ -66,7 +36,10 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
           <button className="date-nav-btn" onClick={onPrevDay}>
             ◀
           </button>
-          <span className="current-date-label">{formatDateSpanish(selectedDate)}</span>
+          <span className="current-date-label">
+            {formatDateSpanish(selectedDate)}
+            {selectedDate === getCostaRicaDateString() ? " · Hoy" : ""}
+          </span>
           <button className="date-nav-btn" onClick={onNextDay}>
             ▶
           </button>
@@ -119,7 +92,7 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                         {m.status === "live" && (
                           <div className="live-time-indicator">
                             <span className="live-dot-blink"></span>
-                            <span className="live-time-text">{getLiveMinute(m.kickoff_utc)}</span>
+                            <span className="live-time-text">{formatLiveMatchTime(m)}</span>
                           </div>
                         )}
                       </div>
@@ -127,12 +100,9 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                       <div className="daily-time-box">
                         <Clock size={12} />
                         <span>
-                          {new Date(m.kickoff_utc).toLocaleTimeString("es-CR", {
-                            timeZone: "America/Costa_Rica",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: false,
-                          })}
+                          {m.time_confirmed === false
+                            ? "Hora por confirmar"
+                            : `${formatCostaRicaTime(m.kickoff_utc)} CR`}
                         </span>
                       </div>
                     )}
