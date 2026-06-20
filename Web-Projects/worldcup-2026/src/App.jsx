@@ -19,6 +19,7 @@ import Bracket from "./components/Bracket";
 import PredictionList from "./components/PredictionList";
 import DailyMatchSection from "./components/DailyMatchSection";
 import TopScorers from "./components/TopScorers";
+import LiveMatchModal from "./components/LiveMatchModal";
 
 // Constants & Data
 import { mockGroups, mockMatches } from "./constants/mockData";
@@ -54,6 +55,7 @@ export default function App() {
   const [liveSyncStatus, setLiveSyncStatus] = useState(() =>
     initialLiveSnapshot ? "stale" : "connecting"
   );
+  const [showLiveMatchDetails, setShowLiveMatchDetails] = useState(false);
   const [titleSimulation, setTitleSimulation] = useState({
     iterations: 0,
     probabilities: [],
@@ -322,6 +324,12 @@ export default function App() {
                         ? `${nextMatchTime} CR · ${nextMatch.phase || nextMatch.round}`
                         : "No hay más partidos programados"
                   }
+                  onClick={liveMatch ? () => setShowLiveMatchDetails(true) : undefined}
+                  ariaLabel={
+                    liveMatch
+                      ? `Abrir estadísticas de ${liveMatch.home_team} contra ${liveMatch.away_team}`
+                      : undefined
+                  }
                 />
               </div>
 
@@ -455,6 +463,10 @@ export default function App() {
       <footer className="footer">
         <p>© 2026 WorldCup Dashboard. Creado para el Mundial 2026 (EE.UU., México y Canadá).</p>
       </footer>
+
+      {showLiveMatchDetails && liveMatch && (
+        <LiveMatchModal match={liveMatch} onClose={() => setShowLiveMatchDetails(false)} />
+      )}
     </div>
   );
 }

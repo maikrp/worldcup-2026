@@ -52,6 +52,47 @@ function scorerEvents(competition, teamId) {
     });
 }
 
+function matchEvents(competition, homeId, awayId) {
+  return (competition.details || [])
+    .map((detail) => {
+      const eventName = String(detail.type?.text || "").toLowerCase();
+      const yellowCard = detail.yellowCard || eventName.includes("yellow");
+      const redCard = detail.redCard || eventName.includes("red");
+
+      return {
+        id: `${detail.type?.id || "event"}-${detail.clock?.value || 0}-${detail.team?.id || ""}`,
+        type: detail.scoringPlay
+          ? "goal"
+          : redCard
+            ? "red-card"
+            : yellowCard
+              ? "yellow-card"
+              : null,
+        minute: detail.clock?.displayValue || "",
+        team:
+          String(detail.team?.id) === String(homeId)
+            ? "home"
+            : String(detail.team?.id) === String(awayId)
+              ? "away"
+              : null,
+        player:
+          detail.athletesInvolved?.[0]?.displayName ||
+          detail.athletesInvolved?.[0]?.shortName ||
+          "Jugador no informado",
+        headshot: detail.athletesInvolved?.[0]?.headshot || null,
+        penalty: Boolean(detail.penaltyKick),
+        ownGoal: Boolean(detail.ownGoal),
+      };
+    })
+    .filter((event) => event.type);
+}
+
+function teamStatistics(competitor) {
+  return Object.fromEntries(
+    (competitor?.statistics || []).map((statistic) => [statistic.name, statistic.displayValue])
+  );
+}
+
 async function fetchEspnGames() {
   const dateRange = `20260611-${getCostaRicaDateKey()}`;
   const response = await fetch(`${ESPN_URL}?dates=${dateRange}`, {
@@ -78,6 +119,13 @@ async function fetchEspnGames() {
         away_score: away?.score ?? null,
         home_scorers: scorerEvents(competition, home?.id),
         away_scorers: scorerEvents(competition, away?.id),
+        match_events: matchEvents(competition, home?.id, away?.id),
+        statistics: {
+          home: teamStatistics(home),
+          away: teamStatistics(away),
+        },
+        venue: competition.venue?.fullName || event.venue?.displayName || null,
+        match_period: status?.type?.description || null,
         local_date: event.date,
         finished: completed ? "TRUE" : "FALSE",
         time_elapsed: completed

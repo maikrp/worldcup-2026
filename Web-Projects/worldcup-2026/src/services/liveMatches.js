@@ -158,6 +158,10 @@ export async function fetchLiveMatches(signal) {
       time_elapsed: game.time_elapsed,
       home_scorers: game.home_scorers,
       away_scorers: game.away_scorers,
+      match_events: game.match_events || [],
+      statistics: game.statistics || null,
+      match_period: game.match_period || null,
+      remoteVenue: game.venue || null,
       remoteLocalDate: game.local_date,
     })),
   };
@@ -180,6 +184,10 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
       time_elapsed: remote.time_elapsed,
       home_scorers: remote.home_scorers,
       away_scorers: remote.away_scorers,
+      match_events: remote.match_events,
+      statistics: remote.statistics,
+      match_period: remote.match_period,
+      stadium: remote.remoteVenue || match.stadium,
       liveDataCachedAt: remote.cachedAt,
       hasLiveData: true,
     };
