@@ -1,4 +1,5 @@
 const SOURCE_URL = "https://worldcup26.ir/get/games";
+const ESPN_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
 const SOURCE_HEADERS = {
   Accept: "application/json",
   "Accept-Language": "en-US,en;q=0.9",
@@ -12,7 +13,7 @@ async function fetchLivePayload() {
     try {
       const sourceResponse = await fetch(SOURCE_URL, {
         headers: SOURCE_HEADERS,
-        signal: AbortSignal.timeout(12000),
+        signal: AbortSignal.timeout(8000),
         cache: "no-store",
       });
 
@@ -30,13 +31,100 @@ async function fetchLivePayload() {
   throw lastError || new Error("Live source unavailable");
 }
 
+function getCostaRicaDateKey() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Costa_Rica",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values.year}${values.month}${values.day}`;
+}
+
+function scorerEvents(competition, teamId) {
+  return (competition.details || [])
+    .filter((detail) => detail.scoringPlay && String(detail.team?.id) === String(teamId))
+    .map((detail) => {
+      const player = detail.athletesInvolved?.[0]?.displayName || "Jugador";
+      const minute = detail.clock?.displayValue || "";
+      return `${player} ${minute}${detail.ownGoal ? " (OG)" : ""}`.trim();
+    });
+}
+
+async function fetchEspnGames() {
+  const dateRange = `20260611-${getCostaRicaDateKey()}`;
+  const response = await fetch(`${ESPN_URL}?dates=${dateRange}`, {
+    headers: SOURCE_HEADERS,
+    signal: AbortSignal.timeout(8000),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`ESPN responded ${response.status}`);
+
+  const payload = await response.json();
+  return (payload.events || []).flatMap((event) =>
+    (event.competitions || []).map((competition) => {
+      const home = competition.competitors?.find((team) => team.homeAway === "home");
+      const away = competition.competitors?.find((team) => team.homeAway === "away");
+      const status = competition.status || event.status;
+      const state = status?.type?.state;
+      const completed = Boolean(status?.type?.completed);
+
+      return {
+        id: event.id,
+        home_team_name_en: home?.team?.displayName,
+        away_team_name_en: away?.team?.displayName,
+        home_score: home?.score ?? null,
+        away_score: away?.score ?? null,
+        home_scorers: scorerEvents(competition, home?.id),
+        away_scorers: scorerEvents(competition, away?.id),
+        local_date: event.date,
+        finished: completed ? "TRUE" : "FALSE",
+        time_elapsed: completed
+          ? "finished"
+          : state === "in"
+            ? status?.displayClock || status?.type?.shortDetail || "live"
+            : "notstarted",
+      };
+    })
+  );
+}
+
+function mergeProviderGames(primaryGames, espnGames) {
+  const key = (game) => `${game.home_team_name_en}|${game.away_team_name_en}`;
+  const merged = new Map((primaryGames || []).map((game) => [key(game), game]));
+
+  espnGames.forEach((game) => {
+    const current = merged.get(key(game));
+    merged.set(key(game), {
+      ...current,
+      ...game,
+      home_scorers: current?.home_scorers || game.home_scorers,
+      away_scorers: current?.away_scorers || game.away_scorers,
+    });
+  });
+
+  return [...merged.values()];
+}
+
 export default async function handler(_request, response) {
   try {
-    const payload = await fetchLivePayload();
+    const [primaryResult, espnResult] = await Promise.allSettled([
+      fetchLivePayload(),
+      fetchEspnGames(),
+    ]);
+    const primaryGames =
+      primaryResult.status === "fulfilled" ? primaryResult.value.games || [] : [];
+    const espnGames = espnResult.status === "fulfilled" ? espnResult.value : [];
+
+    if (!primaryGames.length && !espnGames.length) {
+      throw new Error("All live providers failed");
+    }
+
     response.setHeader("Cache-Control", "no-store, max-age=0");
     response.setHeader("CDN-Cache-Control", "no-store");
     return response.status(200).json({
-      games: payload.games || [],
+      games: mergeProviderGames(primaryGames, espnGames),
       syncedAt: new Date().toISOString(),
     });
   } catch (error) {
