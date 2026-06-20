@@ -19,7 +19,7 @@ function eloFromFifaRank(teamName) {
   return 2050 - (rank - 1) * 12;
 }
 
-function eloStrength(teamName) {
+export function eloStrength(teamName) {
   return 10 ** ((eloFromFifaRank(teamName) - 1800) / 400);
 }
 
@@ -38,12 +38,12 @@ function tournamentStrength(stats) {
   };
 }
 
-function expectedGoalsFor(team, opponent, isHome) {
+function expectedGoalsFor(team, opponent) {
   const teamRating = eloStrength(team?.team_name);
   const opponentRating = eloStrength(opponent?.team_name);
   const teamForm = tournamentStrength(team);
   const opponentForm = tournamentStrength(opponent);
-  const venueBoost = isHome && HOST_TEAMS.has(team?.team_name) ? 1.08 : isHome ? 1.02 : 1;
+  const venueBoost = HOST_TEAMS.has(team?.team_name) ? 1.08 : 1;
 
   const ratingFactor = Math.sqrt(teamRating / opponentRating);
   const formFactor = Math.sqrt(teamForm.attack * opponentForm.defense);
@@ -62,8 +62,8 @@ function normalizePercentages(home, draw, away) {
 }
 
 export function predictMatch(home, away) {
-  const homeExpectedGoals = expectedGoalsFor(home, away, true);
-  const awayExpectedGoals = expectedGoalsFor(away, home, false);
+  const homeExpectedGoals = expectedGoalsFor(home, away);
+  const awayExpectedGoals = expectedGoalsFor(away, home);
   let homeWin = 0;
   let draw = 0;
   let awayWin = 0;
@@ -103,4 +103,44 @@ export function predictMatch(home, away) {
     },
     metadata: RATING_METADATA,
   };
+}
+
+function samplePoisson(expectedGoals, random) {
+  const limit = Math.exp(-expectedGoals);
+  let probability = 1;
+  let goals = 0;
+
+  do {
+    goals += 1;
+    probability *= random();
+  } while (probability > limit);
+
+  return goals - 1;
+}
+
+export function simulateMatchScore(
+  home,
+  away,
+  random,
+  { baseHomeScore = 0, baseAwayScore = 0, remainingShare = 1, knockout = false } = {}
+) {
+  const homeExpectedGoals = expectedGoalsFor(home, away) * remainingShare;
+  const awayExpectedGoals = expectedGoalsFor(away, home) * remainingShare;
+  let homeScore = baseHomeScore + samplePoisson(homeExpectedGoals, random);
+  let awayScore = baseAwayScore + samplePoisson(awayExpectedGoals, random);
+
+  if (knockout && homeScore === awayScore) {
+    homeScore += samplePoisson(expectedGoalsFor(home, away) / 3, random);
+    awayScore += samplePoisson(expectedGoalsFor(away, home) / 3, random);
+  }
+
+  if (knockout && homeScore === awayScore) {
+    const homeStrength = eloStrength(home?.team_name);
+    const awayStrength = eloStrength(away?.team_name);
+    const homePenaltyChance = homeStrength / (homeStrength + awayStrength);
+    if (random() < homePenaltyChance) homeScore += 1;
+    else awayScore += 1;
+  }
+
+  return { homeScore, awayScore };
 }

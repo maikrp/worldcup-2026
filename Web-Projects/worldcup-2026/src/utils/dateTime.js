@@ -26,8 +26,19 @@ export function shiftCalendarDate(dateString, days) {
 export function formatCostaRicaTime(kickoffUtc) {
   return new Intl.DateTimeFormat("es-CR", {
     timeZone: COSTA_RICA_TIME_ZONE,
-    hour: "numeric",
+    hour: "2-digit",
     minute: "2-digit",
-    hour12: true,
+    hour12: false,
   }).format(new Date(kickoffUtc));
+}
+
+export function formatCostaRicaDateTime(kickoffUtc) {
+  const formattedDate = new Intl.DateTimeFormat("es-CR", {
+    timeZone: COSTA_RICA_TIME_ZONE,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(kickoffUtc));
+
+  return `${formattedDate}, ${formatCostaRicaTime(kickoffUtc)}`;
 }

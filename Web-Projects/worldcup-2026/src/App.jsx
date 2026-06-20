@@ -25,7 +25,12 @@ import { mockGroups, mockMatches } from "./constants/mockData";
 import { flagUrl, globalTeamCodes } from "./constants/teamCodes";
 import { buildTopScorers, fallbackTopScorers } from "./constants/topScorers";
 import { fetchLiveMatches, mergeLiveMatches } from "./services/liveMatches";
-import { COSTA_RICA_TIME_ZONE, getCostaRicaDateString, shiftCalendarDate } from "./utils/dateTime";
+import {
+  COSTA_RICA_TIME_ZONE,
+  formatCostaRicaTime,
+  getCostaRicaDateString,
+  shiftCalendarDate,
+} from "./utils/dateTime";
 import { normalizeMatchStatuses } from "./utils/matchStatus";
 import { calculateStandings } from "./utils/standings";
 
@@ -41,12 +46,39 @@ export default function App() {
   const [remoteMatches, setRemoteMatches] = useState([]);
   const [lastLiveSync, setLastLiveSync] = useState(null);
   const [liveSyncStatus, setLiveSyncStatus] = useState("connecting");
+  const [titleSimulation, setTitleSimulation] = useState({
+    iterations: 0,
+    probabilities: [],
+    totalProbability: 0,
+  });
   const matches = normalizeMatchStatuses(
     mergeLiveMatches(mockMatches, remoteMatches),
     new Date(statusClock)
   );
   const topScorers = remoteMatches.length ? buildTopScorers(matches) : fallbackTopScorers;
   const groups = calculateStandings(mockGroups, matches);
+
+  useEffect(() => {
+    const simulationMatches = normalizeMatchStatuses(
+      mergeLiveMatches(mockMatches, remoteMatches),
+      new Date()
+    );
+    const worker = new Worker(new URL("./workers/titleSimulation.worker.js", import.meta.url), {
+      type: "module",
+    });
+
+    worker.onmessage = (event) => setTitleSimulation(event.data);
+    worker.onerror = () =>
+      setTitleSimulation({ iterations: 0, probabilities: [], totalProbability: 0 });
+    worker.postMessage({
+      groupsTemplate: mockGroups,
+      matches: simulationMatches,
+      iterations: 5000,
+    });
+
+    return () => worker.terminate();
+  }, [remoteMatches]);
+  const titleFavorites = titleSimulation.probabilities.slice(0, 3);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => setStatusClock(Date.now()), 30000);
@@ -91,13 +123,7 @@ export default function App() {
     )
     .sort((a, b) => new Date(a.kickoff_utc) - new Date(b.kickoff_utc))[0];
 
-  const nextMatchTime = nextMatch
-    ? new Intl.DateTimeFormat("es-CR", {
-        timeZone: COSTA_RICA_TIME_ZONE,
-        hour: "numeric",
-        minute: "2-digit",
-      }).format(new Date(nextMatch.kickoff_utc))
-    : null;
+  const nextMatchTime = nextMatch ? formatCostaRicaTime(nextMatch.kickoff_utc) : null;
   const featuredMatch = liveMatch || nextMatch;
 
   const handlePrevDay = () => {
@@ -207,6 +233,8 @@ export default function App() {
                           hour: "2-digit",
                           minute: "2-digit",
                           second: "2-digit",
+                          hour12: false,
+                          timeZone: COSTA_RICA_TIME_ZONE,
                         }
                       )}`
                     : liveSyncStatus === "offline"
@@ -218,6 +246,8 @@ export default function App() {
                             hour: "2-digit",
                             minute: "2-digit",
                             second: "2-digit",
+                            hour12: false,
+                            timeZone: COSTA_RICA_TIME_ZONE,
                           })}`
                         : "Conectando datos en vivo…"}
                 </span>
@@ -269,7 +299,7 @@ export default function App() {
                     liveMatch
                       ? `${liveMatch.home_score ?? 0} - ${liveMatch.away_score ?? 0}`
                       : nextMatch
-                        ? `${nextMatchTime} · ${nextMatch.phase || nextMatch.round}`
+                        ? `${nextMatchTime} CR · ${nextMatch.phase || nextMatch.round}`
                         : "No hay más partidos programados"
                   }
                 />
@@ -285,35 +315,45 @@ export default function App() {
                 />
 
                 <div className="dashboard-section">
-                  <h2>Simulación de Favoritos</h2>
+                  <h2>Favoritos al Título</h2>
                   <div className="favorites-list">
-                    <div className="favorite-item">
-                      <div className="fav-rank">1</div>
-                      <img src={flagUrl("ar")} alt="AR" className="fav-flag" />
-                      <div className="fav-info">
-                        <strong>Argentina</strong>
-                        <span>Probabilidad de Título: 18.5%</span>
+                    {titleFavorites.length ? (
+                      titleFavorites.map((favorite, index) => (
+                        <div className="favorite-item" key={favorite.team}>
+                          <div className="fav-rank">{index + 1}</div>
+                          <img
+                            src={flagUrl(globalTeamCodes[favorite.team])}
+                            alt={`Bandera de ${favorite.team}`}
+                            className="fav-flag"
+                          />
+                          <div className="fav-info">
+                            <strong>{favorite.team}</strong>
+                            <span>Probabilidad de título: {favorite.probability.toFixed(1)}%</span>
+                          </div>
+                          <Award
+                            className={`fav-award ${
+                              index === 0 ? "golden" : index === 1 ? "silver" : "bronze"
+                            }`}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="favorite-item favorite-loading">
+                        <div className="spinner favorite-spinner"></div>
+                        <div className="fav-info">
+                          <strong>Calculando probabilidades</strong>
+                          <span>Simulando grupos, mejores terceros y eliminatorias…</span>
+                        </div>
                       </div>
-                      <Award className="fav-award golden" />
-                    </div>
-                    <div className="favorite-item">
-                      <div className="fav-rank">2</div>
-                      <img src={flagUrl("fr")} alt="FR" className="fav-flag" />
-                      <div className="fav-info">
-                        <strong>Francia</strong>
-                        <span>Probabilidad de Título: 15.2%</span>
-                      </div>
-                      <Award className="fav-award silver" />
-                    </div>
-                    <div className="favorite-item">
-                      <div className="fav-rank">3</div>
-                      <img src={flagUrl("br")} alt="BR" className="fav-flag" />
-                      <div className="fav-info">
-                        <strong>Brasil</strong>
-                        <span>Probabilidad de Título: 14.0%</span>
-                      </div>
-                      <Award className="fav-award bronze" />
-                    </div>
+                    )}
+                    <p className="favorites-method">
+                      {titleSimulation.iterations
+                        ? `${titleSimulation.iterations.toLocaleString(
+                            "es-CR"
+                          )} simulaciones completas · resultados y minuto en vivo actuales`
+                        : "5.000 simulaciones en segundo plano"}{" "}
+                      · modelo FIFA, forma y Poisson
+                    </p>
                   </div>
                 </div>
               </div>

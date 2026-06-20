@@ -70,7 +70,6 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
 
                 <div className="daily-match-teams-box">
                   <div className="daily-team home">
-                    <span className="daily-team-name">{m.home_team}</span>
                     <img
                       src={flagUrl(teamCodes[m.home_team] || "un")}
                       alt={m.home_team}
@@ -79,6 +78,7 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                         e.target.src = "https://flagcdn.com/w40/un.png";
                       }}
                     />
+                    <span className="daily-team-name">{m.home_team}</span>
                   </div>
 
                   <div className="daily-score-box">

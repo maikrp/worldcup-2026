@@ -371,14 +371,16 @@ body {
 
 .next-match-team {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   min-width: 0;
+  text-align: center;
 }
 
 .next-match-team img {
-  width: 30px;
-  height: 21px;
+  width: 42px;
+  height: 29px;
   border-radius: 4px;
   object-fit: cover;
   box-shadow: 0 2px 7px rgba(0, 0, 0, 0.28);
@@ -494,6 +496,24 @@ body {
   color: #b45309;
 }
 
+.favorites-method {
+  margin: 3px 4px 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.favorite-loading {
+  min-height: 70px;
+}
+
+.favorite-spinner {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+  flex-shrink: 0;
+}
+
 .match-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
@@ -575,13 +595,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 68px;
 }
 
 .team-name-flag {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 7px;
   min-width: 0;
+  text-align: center;
 }
 
 .team-name-flag span {
@@ -589,8 +613,8 @@ body {
 }
 
 .flag-img {
-  width: 28px;
-  height: 20px;
+  width: 42px;
+  height: 29px;
   border-radius: 4px;
   object-fit: cover;
   border: 1px solid var(--border-color);
@@ -1942,19 +1966,22 @@ td {
 
 .daily-team {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 7px;
   width: 40%;
+  text-align: center;
 }
 
 .daily-team.home {
-  justify-content: flex-end;
-  text-align: right;
+  justify-content: center;
+  text-align: center;
 }
 
 .daily-team.away {
-  justify-content: flex-start;
-  text-align: left;
+  justify-content: center;
+  text-align: center;
 }
 
 .daily-team-name {
@@ -1964,8 +1991,8 @@ td {
 }
 
 .daily-flag {
-  width: 28px;
-  height: 20px;
+  width: 44px;
+  height: 30px;
   border-radius: 4px;
   object-fit: cover;
   border: 1px solid var(--border-color);

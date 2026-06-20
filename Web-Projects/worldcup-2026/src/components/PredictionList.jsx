@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CalendarDays, Database, Filter, Sparkles, TrendingUp } from "lucide-react";
 import { globalTeamCodes as teamCodes, flagUrl } from "../constants/teamCodes";
+import { formatCostaRicaTime } from "../utils/dateTime";
 import { predictMatch } from "../utils/prediction";
 
 function getCostaRicaDate(kickoffUtc) {
@@ -137,13 +138,11 @@ export default function PredictionList({ matches, groups }) {
                             day: "numeric",
                             month: "short",
                           })} · Hora por confirmar`
-                        : new Date(m.kickoff_utc).toLocaleString("es-CR", {
+                        : `${new Date(m.kickoff_utc).toLocaleDateString("es-CR", {
                             timeZone: "America/Costa_Rica",
                             day: "numeric",
                             month: "short",
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })}
+                          })}, ${formatCostaRicaTime(m.kickoff_utc)} CR`}
                     </small>
                   </div>
                   <span className="prediction-badge">

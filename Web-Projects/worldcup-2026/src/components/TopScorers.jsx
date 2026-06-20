@@ -132,7 +132,14 @@ export default function TopScorers({ scorers }) {
             </button>
 
             <div className="goal-modal-player">
-              <img src={selectedPlayer.photo} alt={selectedPlayer.name} />
+              <img
+                src={selectedPlayer.photo}
+                alt={selectedPlayer.name}
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = "/players/player-fallback.webp";
+                }}
+              />
               <div>
                 <span>Detalle de anotaciones</span>
                 <h3 id="goal-modal-title">{selectedPlayer.name}</h3>

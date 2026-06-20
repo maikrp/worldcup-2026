@@ -2,7 +2,7 @@ import React from "react";
 import { MapPin, Clock } from "lucide-react";
 import { globalTeamCodes as teamCodes, flagUrl } from "../constants/teamCodes";
 import { predictMatch } from "../utils/prediction";
-import { COSTA_RICA_TIME_ZONE } from "../utils/dateTime";
+import { COSTA_RICA_TIME_ZONE, formatCostaRicaDateTime } from "../utils/dateTime";
 import { formatLiveMatchTime } from "../utils/matchStatus";
 
 export default function MatchGrid({ matches, groups }) {
@@ -98,11 +98,7 @@ export default function MatchGrid({ matches, groups }) {
                     ? `${new Date(m.kickoff_utc).toLocaleDateString("es-CR", {
                         timeZone: COSTA_RICA_TIME_ZONE,
                       })} · Hora por confirmar`
-                    : `${new Date(m.kickoff_utc).toLocaleString("es-CR", {
-                        timeZone: COSTA_RICA_TIME_ZONE,
-                        dateStyle: "short",
-                        timeStyle: "short",
-                      })} CR`}
+                    : `${formatCostaRicaDateTime(m.kickoff_utc)} CR`}
                 </span>
               </div>
             </div>

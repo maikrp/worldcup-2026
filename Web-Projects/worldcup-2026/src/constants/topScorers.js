@@ -21,9 +21,17 @@ const KNOWN_OWN_GOALS = new Set([
 ]);
 
 const PLAYER_PHOTOS = {
+  "Cyle Larin": "/players/cyle-larin.png",
+  "Erling Haaland": "/players/erling-haaland.jpg",
+  "Folarin Balogun": "/players/folarin-balogun.jpg",
+  "Jonathan David": "/players/jonathan-david.jpg",
+  "Kai Havertz": "/players/kai-havertz.jpg",
   "Kylian Mbappé": "/players/mbappe.webp",
   "Harry Kane": "/players/kane.webp",
   "Lionel Messi": "/players/messi.webp",
+  "Matheus Cunha": "/players/matheus-cunha.jpg",
+  "Vinícius Júnior": "/players/vinicius-junior.jpg",
+  "Yasin Ayari": "/players/yasin-ayari.jpg",
 };
 
 function parseScorerEvents(rawScorers) {
