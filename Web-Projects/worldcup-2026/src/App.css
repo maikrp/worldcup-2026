@@ -359,6 +359,7 @@ body {
 .next-match-teams {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin: 8px 0;
 }
@@ -392,11 +393,64 @@ body {
   line-height: 1.2;
 }
 
+.featured-live-summary {
+  display: flex;
+  flex: 1 0 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.featured-live-score {
+  margin: 0;
+  padding: 5px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  background: var(--bg-secondary);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.featured-live-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-secondary);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 @media (max-width: 480px) {
   .next-match-teams {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+  }
+
+  .next-match-team strong {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+
+  .featured-live-summary {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .featured-live-score {
+    font-size: 22px;
+  }
+
+  .featured-live-label {
+    font-size: 10px;
   }
 }
 
@@ -2043,8 +2097,61 @@ td {
   .daily-team-name {
     font-size: 13px;
   }
+
   .daily-match-teams-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(86px, auto) minmax(0, 1fr);
     gap: 8px;
+  }
+
+  .daily-team,
+  .daily-score-box {
+    width: auto;
+  }
+
+  .daily-score-wrapper-container {
+    min-width: 78px;
+  }
+
+  .live-time-indicator {
+    justify-content: center;
+    width: max-content;
+    max-width: 112px;
+  }
+
+  .live-time-text {
+    white-space: nowrap;
+  }
+
+  .daily-time-box {
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .prediction-label-compact {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    font-size: 10px;
+  }
+
+  .prediction-label-compact span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .prediction-label-compact span:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .prediction-label-compact span:nth-child(3) {
+    text-align: center;
+  }
+
+  .prediction-label-compact span:last-child {
+    text-align: right;
   }
 }
 

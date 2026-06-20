@@ -3,7 +3,7 @@ import { Clock, Calendar } from "lucide-react";
 import { globalTeamCodes as teamCodes, flagUrl } from "../constants/teamCodes";
 import { predictMatch } from "../utils/prediction";
 import { formatCostaRicaTime, getCostaRicaDateString } from "../utils/dateTime";
-import { formatLiveMatchTime } from "../utils/matchStatus";
+import { formatLiveMatchLabel } from "../utils/matchStatus";
 
 export default function DailyMatchSection({ matches, groups, selectedDate, onPrevDay, onNextDay }) {
   const dailyMatches = matches
@@ -92,7 +92,7 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                         {m.status === "live" && (
                           <div className="live-time-indicator">
                             <span className="live-dot-blink"></span>
-                            <span className="live-time-text">{formatLiveMatchTime(m)}</span>
+                            <span className="live-time-text">{formatLiveMatchLabel(m)}</span>
                           </div>
                         )}
                       </div>

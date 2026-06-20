@@ -31,7 +31,7 @@ import {
   getCostaRicaDateString,
   shiftCalendarDate,
 } from "./utils/dateTime";
-import { formatLiveMatchTime, normalizeMatchStatuses } from "./utils/matchStatus";
+import { formatLiveMatchLabel, normalizeMatchStatuses } from "./utils/matchStatus";
 import { calculateStandings } from "./utils/standings";
 
 export default function App() {
@@ -81,7 +81,7 @@ export default function App() {
   const titleFavorites = titleSimulation.probabilities.slice(0, 3);
 
   useEffect(() => {
-    const intervalId = window.setInterval(() => setStatusClock(Date.now()), 30000);
+    const intervalId = window.setInterval(() => setStatusClock(Date.now()), 15000);
     return () => window.clearInterval(intervalId);
   }, []);
 
@@ -108,7 +108,7 @@ export default function App() {
     };
 
     synchronizeLiveMatches();
-    const intervalId = window.setInterval(synchronizeLiveMatches, 60000);
+    const intervalId = window.setInterval(synchronizeLiveMatches, 30000);
 
     return () => {
       window.clearInterval(intervalId);
@@ -285,6 +285,17 @@ export default function App() {
                           />
                           <strong>{featuredMatch.away_team}</strong>
                         </div>
+                        {liveMatch && (
+                          <div className="featured-live-summary" aria-live="polite">
+                            <strong className="featured-live-score">
+                              {liveMatch.home_score ?? 0} - {liveMatch.away_score ?? 0}
+                            </strong>
+                            <span className="featured-live-label">
+                              <span className="live-dot-blink" aria-hidden="true"></span>
+                              {formatLiveMatchLabel(liveMatch)}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     ) : null
                   }
@@ -297,9 +308,7 @@ export default function App() {
                   }
                   sub={
                     liveMatch
-                      ? `${liveMatch.home_score ?? 0} - ${liveMatch.away_score ?? 0} · ${formatLiveMatchTime(
-                          liveMatch
-                        )}`
+                      ? liveMatch.phase || liveMatch.round
                       : nextMatch
                         ? `${nextMatchTime} CR · ${nextMatch.phase || nextMatch.round}`
                         : "No hay más partidos programados"

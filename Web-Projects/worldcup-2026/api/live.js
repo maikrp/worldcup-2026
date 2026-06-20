@@ -13,7 +13,8 @@ export default async function handler(_request, response) {
     }
 
     const payload = await sourceResponse.json();
-    response.setHeader("Cache-Control", "s-maxage=20, stale-while-revalidate=40");
+    response.setHeader("Cache-Control", "no-store, max-age=0");
+    response.setHeader("CDN-Cache-Control", "no-store");
     return response.status(200).json({
       games: payload.games || [],
       syncedAt: new Date().toISOString(),

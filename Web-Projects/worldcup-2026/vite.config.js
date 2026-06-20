@@ -59,7 +59,17 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,png,jpg,webp,svg,woff2}"],
         cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         navigateFallback: "index.html",
+        navigateFallbackDenylist: [/^\/api\//],
+        runtimeCaching: [
+          {
+            urlPattern: /\/api\/live(?:\?.*)?$/,
+            handler: "NetworkOnly",
+            method: "GET",
+          },
+        ],
       },
     }),
   ],

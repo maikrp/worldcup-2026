@@ -3,7 +3,7 @@ import { MapPin, Clock } from "lucide-react";
 import { globalTeamCodes as teamCodes, flagUrl } from "../constants/teamCodes";
 import { predictMatch } from "../utils/prediction";
 import { COSTA_RICA_TIME_ZONE, formatCostaRicaDateTime } from "../utils/dateTime";
-import { formatLiveMatchTime } from "../utils/matchStatus";
+import { formatLiveMatchLabel } from "../utils/matchStatus";
 
 export default function MatchGrid({ matches, groups }) {
   if (matches.length === 0) {
@@ -34,7 +34,7 @@ export default function MatchGrid({ matches, groups }) {
               {m.status === "complete" ? (
                 <span className="status-badge complete">Finalizado</span>
               ) : m.status === "live" ? (
-                <span className="status-badge live">{formatLiveMatchTime(m)}</span>
+                <span className="status-badge live">{formatLiveMatchLabel(m)}</span>
               ) : (
                 <span className="status-badge live-blink">Programado</span>
               )}
