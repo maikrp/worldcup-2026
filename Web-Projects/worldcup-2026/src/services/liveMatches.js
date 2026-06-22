@@ -167,6 +167,93 @@ export async function fetchLiveMatches(signal) {
   };
 }
 
+function getUtcOffsetForStadium(stadiumName) {
+  if (!stadiumName) return -6;
+  const name = stadiumName.toLowerCase();
+
+  // UTC-4 (EDT)
+  if (
+    name.includes("boston") ||
+    name.includes("gillette") ||
+    name.includes("new york") ||
+    name.includes("metlife") ||
+    name.includes("miami") ||
+    name.includes("hard rock") ||
+    name.includes("atlanta") ||
+    name.includes("mercedes") ||
+    name.includes("philadelphia") ||
+    name.includes("lincoln") ||
+    name.includes("toronto") ||
+    name.includes("bmo")
+  ) {
+    return -4;
+  }
+
+  // UTC-5 (CDT)
+  if (
+    name.includes("dallas") ||
+    name.includes("at&t") ||
+    name.includes("houston") ||
+    name.includes("nrg") ||
+    name.includes("kansas") ||
+    name.includes("arrowhead")
+  ) {
+    return -5;
+  }
+
+  // UTC-6 (CST / México)
+  if (
+    name.includes("mexico") ||
+    name.includes("azteca") ||
+    name.includes("monterrey") ||
+    name.includes("guadalajara")
+  ) {
+    return -6;
+  }
+
+  // UTC-7 (PDT)
+  if (
+    name.includes("vancouver") ||
+    name.includes("bc place") ||
+    name.includes("los angeles") ||
+    name.includes("sofi") ||
+    name.includes("seattle") ||
+    name.includes("lumen") ||
+    name.includes("san francisco") ||
+    name.includes("levi")
+  ) {
+    return -7;
+  }
+
+  return -6;
+}
+
+function parseRemoteLocalDate(dateStr, stadiumName) {
+  if (!dateStr) return null;
+  if (dateStr.includes("T") || dateStr.includes("Z")) {
+    return dateStr;
+  }
+
+  const match = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/);
+  if (match) {
+    const [, month, day, year, hour, minute] = match;
+    const offset = getUtcOffsetForStadium(stadiumName);
+    const absOffset = Math.abs(offset);
+    const sign = offset >= 0 ? "+" : "-";
+    const formattedOffset = `${sign}${String(absOffset).padStart(2, "0")}:00`;
+    const isoString = `${year}-${month}-${day}T${hour}:${minute}:00${formattedOffset}`;
+    try {
+      const d = new Date(isoString);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString();
+      }
+    } catch {
+      // ignore parsing failure and return original string
+    }
+  }
+  return dateStr;
+}
+
 export function mergeLiveMatches(localMatches, remoteMatches) {
   const remoteByTeams = new Map(
     remoteMatches.map((match) => [`${match.home_team}|${match.away_team}`, match])
@@ -176,7 +263,7 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
     const remote = remoteByTeams.get(`${match.home_team}|${match.away_team}`);
     if (!remote) return match;
 
-    return {
+    const merged = {
       ...match,
       home_score: remote.home_score,
       away_score: remote.away_score,
@@ -191,5 +278,15 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
       liveDataCachedAt: remote.cachedAt,
       hasLiveData: true,
     };
+
+    if (remote.remoteLocalDate) {
+      const parsedUtc = parseRemoteLocalDate(remote.remoteLocalDate, merged.stadium);
+      if (parsedUtc) {
+        merged.kickoff_utc = parsedUtc;
+        merged.time_confirmed = true;
+      }
+    }
+
+    return merged;
   });
 }

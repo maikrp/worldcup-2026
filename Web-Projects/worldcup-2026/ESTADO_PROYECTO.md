@@ -1,6 +1,6 @@
 # Estado del proyecto — World Cup 2026
 
-Última actualización: 20 de junio de 2026
+Última actualización: 22 de junio de 2026
 
 ## Estado general
 
@@ -19,6 +19,7 @@ tablas, goleadores, pronósticos y llaves.
 - Banderas de los equipos colocadas sobre el nombre de la selección en las tarjetas principales.
 - Horarios no confirmados identificados como “Hora por confirmar”, sin presentar horas de relleno
   como oficiales.
+- Sincronización de horarios corregida (22 de junio de 2026): integración automática de los horarios confirmados y kickoff de la API en vivo a los partidos locales, convirtiendo los horarios locales del estadio a UTC según el huso correspondiente.
 - Listado general de partidos con búsqueda, filtro por fecha y orden ascendente/descendente.
 - Calendario completo de fase de grupos: 72 partidos, 48 selecciones y tres encuentros por equipo.
 - Tablas calculadas para los 12 grupos (A–L).
@@ -76,9 +77,9 @@ tablas, goleadores, pronósticos y llaves.
 
 ## Validaciones realizadas
 
-- `npm run format:check`: aprobado el 20 de junio de 2026.
-- `npm run lint`: aprobado sin errores.
-- `npm run build`: aprobado; Vite procesó 1487 módulos y generó el worker de simulación.
+- `npm run format:check`: aprobado el 22 de junio de 2026.
+- `npm run lint`: aprobado sin errores el 22 de junio de 2026.
+- `npm run build`: aprobado y compilado correctamente el 22 de junio de 2026; Vite procesó 1487 módulos y generó el worker de simulación.
 - Salida principal: JavaScript gzip aproximado de 63.1 KB y CSS gzip aproximado de 6.2 KB.
 - PWA generada correctamente con 41 recursos precargados.
 - Prueba matemática: 5.000 simulaciones completadas y probabilidades de campeones sumando 100%.
