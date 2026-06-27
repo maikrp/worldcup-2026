@@ -93,6 +93,18 @@ function teamStatistics(competitor) {
   );
 }
 
+function teamLineup(competitor) {
+  if (!competitor?.roster) return null;
+  // Extraemos la información del roster (alineación titular) asumiendo la estructura típica de ESPN
+  return competitor.roster
+    .filter(player => player.starter)
+    .map(player => ({
+      name: player.athlete?.displayName || player.athlete?.shortName || "Desconocido",
+      number: player.athlete?.jersey || "",
+      position: player.position?.abbreviation || "",
+    }));
+}
+
 async function fetchEspnGames() {
   const dateRange = `20260611-${getCostaRicaDateKey()}`;
   const response = await fetch(`${ESPN_URL}?dates=${dateRange}`, {
@@ -120,6 +132,8 @@ async function fetchEspnGames() {
         home_scorers: scorerEvents(competition, home?.id),
         away_scorers: scorerEvents(competition, away?.id),
         match_events: matchEvents(competition, home?.id, away?.id),
+        home_lineup: teamLineup(home),
+        away_lineup: teamLineup(away),
         statistics: {
           home: teamStatistics(home),
           away: teamStatistics(away),
@@ -149,6 +163,8 @@ function mergeProviderGames(primaryGames, espnGames) {
       ...game,
       home_scorers: current?.home_scorers || game.home_scorers,
       away_scorers: current?.away_scorers || game.away_scorers,
+      home_lineup: current?.home_lineup || game.home_lineup,
+      away_lineup: current?.away_lineup || game.away_lineup,
     });
   });
 

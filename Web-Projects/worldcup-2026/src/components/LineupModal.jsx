@@ -3,31 +3,69 @@ import { X, Users } from "lucide-react";
 import { flagUrl, globalTeamCodes } from "../constants/teamCodes";
 import "./LineupModal.css";
 
+const genericNames = [
+  "Silva", "García", "Smith", "Müller", "González", "Díaz", "Martínez", "López", 
+  "Jones", "Taylor", "Williams", "Brown", "Davies", "Evans", "Wilson", "Thomas",
+  "Kim", "Lee", "Park", "Choi", "Koulibaly", "Traoré", "Diop", "Gueye",
+  "Rossi", "Bianchi", "Russo", "Ferrari", "Dupont", "Martin", "Bernard",
+  "Johansson", "Andersson", "Karlsson", "Nilsen", "Al-Fayed", "Hassan", "Ali"
+];
+
 const getMockFormation = (teamName) => {
-  // Simulación de formación 4-3-3 genérica
+  // Generar un índice base estable según el nombre del equipo
+  const charSum = (teamName || "").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  
+  const getName = (index) => {
+    return genericNames[(charSum + index) % genericNames.length];
+  };
+
   return [
-    [{ number: 1, name: "Portero" }],
+    [{ number: 1, name: getName(0) }],
     [
-      { number: 2, name: "Lat. Der" },
-      { number: 4, name: "Central 1" },
-      { number: 5, name: "Central 2" },
-      { number: 3, name: "Lat. Izq" }
+      { number: 2, name: getName(1) },
+      { number: 4, name: getName(2) },
+      { number: 5, name: getName(3) },
+      { number: 3, name: getName(4) }
     ],
     [
-      { number: 8, name: "Int. Der" },
-      { number: 6, name: "Pivote" },
-      { number: 10, name: "Int. Izq" }
+      { number: 8, name: getName(5) },
+      { number: 6, name: getName(6) },
+      { number: 10, name: getName(7) }
     ],
     [
-      { number: 7, name: "Ext. Der" },
-      { number: 9, name: "Delantero" },
-      { number: 11, name: "Ext. Izq" }
+      { number: 7, name: getName(8) },
+      { number: 9, name: getName(9) },
+      { number: 11, name: getName(10) }
     ]
+  ];
+};
+
+const getFormationFromData = (lineupData, fallbackTeamName) => {
+  if (!lineupData || lineupData.length < 11) {
+    return getMockFormation(fallbackTeamName);
+  }
+
+  // Ordenar por posiciones si es posible o simplemente agrupar
+  // Asumimos que la lista viene ordenada por la API o simplemente la dividimos en 4 líneas
+  const goalkeepers = lineupData.slice(0, 1);
+  const defenders = lineupData.slice(1, 5);
+  const midfielders = lineupData.slice(5, 8);
+  const forwards = lineupData.slice(8, 11);
+
+  const formatPlayers = (players) => players.map(p => ({ number: p.number, name: p.name.split(" ").pop() }));
+
+  return [
+    formatPlayers(goalkeepers),
+    formatPlayers(defenders),
+    formatPlayers(midfielders),
+    formatPlayers(forwards)
   ];
 };
 
 export default function LineupModal({ match, teamName, onClose }) {
   const closeButtonRef = useRef(null);
+  const [realLineup, setRealLineup] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -39,13 +77,41 @@ export default function LineupModal({ match, teamName, onClose }) {
     document.addEventListener("keydown", closeOnEscape);
     closeButtonRef.current?.focus();
 
+    const espnId = match?.sourceId || match?.id;
+    if (espnId) {
+      fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=${espnId}`)
+        .then(res => res.json())
+        .then(data => {
+          const rosters = data.rosters || [];
+          // Encontrar el roster del equipo
+          const teamRoster = rosters.find(r => r.team?.displayName === teamName || r.team?.shortDisplayName === teamName);
+          if (teamRoster && teamRoster.roster) {
+            const starters = teamRoster.roster
+              .filter(p => p.starter)
+              .map(p => ({
+                name: p.athlete?.displayName || p.athlete?.shortName || "Jugador",
+                number: p.jersey || "",
+                position: p.position?.abbreviation || "",
+              }));
+            setRealLineup(starters);
+          }
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", closeOnEscape);
     };
-  }, [onClose]);
+  }, [onClose, match, teamName]);
 
-  const formation = getMockFormation(teamName);
+  const isHome = match.home_team === teamName || match.home_team_name_en === teamName;
+  const lineupData = realLineup || (isHome ? match.home_lineup : match.away_lineup);
+  const formation = getFormationFromData(lineupData, teamName);
+  
   const teamCode = globalTeamCodes[teamName] || "un";
 
   return (
@@ -87,7 +153,6 @@ export default function LineupModal({ match, teamName, onClose }) {
               <div className="formation-row" key={rowIndex}>
                 {row.map((player) => (
                   <div className="player-node" key={player.number}>
-                    <div className="player-number">{player.number}</div>
                     <div className="player-name">{player.name}</div>
                   </div>
                 ))}
