@@ -159,8 +159,8 @@ export default function App() {
 
     return (
       matchesDate &&
-      (m.home_team.toLowerCase().includes(q) ||
-        m.away_team.toLowerCase().includes(q) ||
+      ((m.home_team || "TBD").toLowerCase().includes(q) ||
+        (m.away_team || "TBD").toLowerCase().includes(q) ||
         (m.stadium && m.stadium.toLowerCase().includes(q)) ||
         (m.phase && m.phase.toLowerCase().includes(q)))
     );
