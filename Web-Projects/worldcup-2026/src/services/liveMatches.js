@@ -299,6 +299,8 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
       return { 
         ...m, 
         id: 10000 + idx,
+        home_team: m.home_team || "TBD",
+        away_team: m.away_team || "TBD",
         stadium,
         kickoff_utc: parsedUtc,
         time_confirmed: true,
