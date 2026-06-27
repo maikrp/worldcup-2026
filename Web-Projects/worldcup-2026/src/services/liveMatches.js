@@ -293,7 +293,18 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
   const localKeys = new Set(localMatches.map(m => `${m.home_team}|${m.away_team}`));
   const unmatchedRemotes = remoteMatches
     .filter(m => !localKeys.has(`${m.home_team}|${m.away_team}`))
-    .map(m => ({ ...m, hasLiveData: true }));
+    .map((m, idx) => {
+      const stadium = m.remoteVenue || "Por definir";
+      const parsedUtc = parseRemoteLocalDate(m.remoteLocalDate, stadium) || m.remoteLocalDate || new Date().toISOString();
+      return { 
+        ...m, 
+        id: 10000 + idx,
+        stadium,
+        kickoff_utc: parsedUtc,
+        time_confirmed: true,
+        hasLiveData: true 
+      };
+    });
 
   return [...mergedMatches, ...unmatchedRemotes];
 }
