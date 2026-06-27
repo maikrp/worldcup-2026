@@ -66,14 +66,14 @@ const LATER_ROUNDS = [
 }));
 
 function resolveSlot(slot, groups) {
-  if (slot[0] === "third") return `Mejor 3.º (${slot[1]})`;
+  if (slot[0] === "third") return { full: `Mejor 3.º (${slot[1]})`, base: null };
 
   const [, groupName, position] = slot;
   const group = groups.find((item) => item.name === groupName);
   const team = group?.standings[position - 1]?.team_name;
   return team
-    ? `${team} · ${position}.º ${groupName} provisional`
-    : `${position}.º Grupo ${groupName}`;
+    ? { full: `${team} · ${position}.º ${groupName} provisional`, base: team }
+    : { full: `${position}.º Grupo ${groupName}`, base: null };
 }
 
 function enumerateRemainingPoints(basePoints, remainingMatches, callback, index = 0) {
@@ -144,11 +144,11 @@ function MatchBox({ match, isHighlighted, realMatch }) {
         {status === 'live' && <span className="live-dot-blink" style={{ marginLeft: 6, display: 'inline-block' }}></span>}
       </div>
       <div className="bracket-team">
-        <span>{realMatch?.home_team || match.t1}</span>
+        <span>{realMatch?.home_team || match.t1.full || match.t1}</span>
         <strong className="bracket-score">{t1Score}</strong>
       </div>
       <div className="bracket-team separator">
-        <span>{realMatch?.away_team || match.t2}</span>
+        <span>{realMatch?.away_team || match.t2.full || match.t2}</span>
         <strong className="bracket-score">{t2Score}</strong>
       </div>
     </div>
@@ -166,11 +166,17 @@ export default function Bracket({ groups = [], matches = [] }) {
       {
         id: "r32",
         label: "Ronda de 32",
-        matches: R32_MATCHES.map((match) => ({
-          ...match,
-          t1: resolveSlot(match.t1, groups),
-          t2: resolveSlot(match.t2, groups),
-        })),
+        matches: R32_MATCHES.map((match) => {
+          const res1 = resolveSlot(match.t1, groups);
+          const res2 = resolveSlot(match.t2, groups);
+          return {
+            ...match,
+            t1: res1,
+            t2: res2,
+            team1Base: res1.base,
+            team2Base: res2.base,
+          };
+        }),
       },
       ...LATER_ROUNDS,
     ],
@@ -231,8 +237,22 @@ export default function Bracket({ groups = [], matches = [] }) {
               </div>
               <div className="bracket-matches">
                 {round.matches.map((match) => {
-                  const matchNumber = parseInt(match.id.replace("M", ""), 10);
-                  const realMatch = matches.find((m) => m.id === matchNumber);
+                  let realMatch = null;
+
+                  // Primero intentamos hacer match por nombre exacto de los equipos involucrados (para los unmatched remotes)
+                  if (match.team1Base && match.team2Base) {
+                    realMatch = matches.find(m => 
+                      (m.home_team === match.team1Base && m.away_team === match.team2Base) ||
+                      (m.home_team === match.team2Base && m.away_team === match.team1Base)
+                    );
+                  }
+
+                  // Fallback: por número de partido (si existiera en localMatches)
+                  if (!realMatch) {
+                    const matchNumber = parseInt(match.id.replace("M", ""), 10);
+                    realMatch = matches.find((m) => m.id === matchNumber);
+                  }
+
                   return (
                     <MatchBox 
                       key={match.id} 

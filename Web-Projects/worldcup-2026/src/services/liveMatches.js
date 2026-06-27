@@ -259,7 +259,7 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
     remoteMatches.map((match) => [`${match.home_team}|${match.away_team}`, match])
   );
 
-  return localMatches.map((match) => {
+  const mergedMatches = localMatches.map((match) => {
     const remote = remoteByTeams.get(`${match.home_team}|${match.away_team}`);
     if (!remote) return match;
 
@@ -289,4 +289,11 @@ export function mergeLiveMatches(localMatches, remoteMatches) {
 
     return merged;
   });
+
+  const localKeys = new Set(localMatches.map(m => `${m.home_team}|${m.away_team}`));
+  const unmatchedRemotes = remoteMatches
+    .filter(m => !localKeys.has(`${m.home_team}|${m.away_team}`))
+    .map(m => ({ ...m, hasLiveData: true }));
+
+  return [...mergedMatches, ...unmatchedRemotes];
 }
