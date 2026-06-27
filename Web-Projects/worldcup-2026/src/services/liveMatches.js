@@ -51,9 +51,10 @@ const TEAM_NAMES = {
   Uruguay: "Uruguay",
   Uzbekistan: "Uzbekistán",
   "DR Congo": "Congo RD",
+  "Congo DR": "Congo RD",
 };
 
-const LIVE_MATCHES_CACHE_KEY = "worldcup-2026:live-matches:v2";
+const LIVE_MATCHES_CACHE_KEY = "worldcup-2026:live-matches:v3";
 const CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
 function parseScore(value) {
