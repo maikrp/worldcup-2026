@@ -106,7 +106,7 @@ function teamLineup(competitor) {
 }
 
 async function fetchEspnGames() {
-  const dateRange = `20260611-${getCostaRicaDateKey()}`;
+  const dateRange = `20260611-20260719`;
   const response = await fetch(`${ESPN_URL}?dates=${dateRange}`, {
     headers: SOURCE_HEADERS,
     signal: AbortSignal.timeout(8000),
