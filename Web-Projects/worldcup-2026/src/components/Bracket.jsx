@@ -133,8 +133,9 @@ function getGuaranteedQualifiers(groups, matches) {
 }
 
 function MatchBox({ match, isHighlighted, realMatch }) {
-  const t1Score = realMatch?.home_score ?? "—";
-  const t2Score = realMatch?.away_score ?? "—";
+  const isScheduled = realMatch?.status === "scheduled" || !realMatch?.status;
+  const t1Score = !isScheduled && realMatch?.home_score != null ? realMatch.home_score : "—";
+  const t2Score = !isScheduled && realMatch?.away_score != null ? realMatch.away_score : "—";
   const status = realMatch?.status;
 
   return (
