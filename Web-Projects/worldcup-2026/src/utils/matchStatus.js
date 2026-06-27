@@ -1,4 +1,11 @@
 export function getEffectiveMatchStatus(match, now = new Date()) {
+  const kickoff = new Date(match.kickoff_utc);
+  const isFuture = !Number.isNaN(kickoff.getTime()) && kickoff.getTime() > now.getTime();
+  
+  if (isFuture) {
+    return "scheduled";
+  }
+
   if (match.hasLiveData) {
     const cachedAt = new Date(match.liveDataCachedAt).getTime();
     const cacheIsOld = Number.isFinite(cachedAt) && now.getTime() - cachedAt > 4 * 60 * 60 * 1000;
