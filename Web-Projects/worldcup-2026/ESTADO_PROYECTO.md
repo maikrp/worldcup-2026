@@ -1,6 +1,6 @@
 # Estado del proyecto — World Cup 2026
 
-Última actualización: 22 de junio de 2026
+Última actualización: 27 de junio de 2026
 
 ## Estado general
 
@@ -12,6 +12,7 @@ tablas, goleadores, pronósticos y llaves.
 
 - Dashboard principal con resumen del torneo y navegación por secciones.
 - “Partidos de la fecha” abre automáticamente en la fecha actual de Costa Rica.
+- Modal interactivo de alineación simulada al hacer clic sobre la bandera de un equipo en la sección "Partidos de la Fecha".
 - Conversión centralizada de fechas y horas mediante la zona `America/Costa_Rica`.
 - Horarios visibles en formato de 24 horas.
 - Jornada del 20 de junio corregida contra el calendario FIFA: 11:00, 14:00, 18:00 y 22:00 en

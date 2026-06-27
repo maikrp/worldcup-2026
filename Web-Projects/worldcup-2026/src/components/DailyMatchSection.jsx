@@ -4,8 +4,11 @@ import { globalTeamCodes as teamCodes, flagUrl } from "../constants/teamCodes";
 import { predictMatch } from "../utils/prediction";
 import { formatCostaRicaTime, getCostaRicaDateString } from "../utils/dateTime";
 import { formatLiveMatchLabel } from "../utils/matchStatus";
+import LineupModal from "./LineupModal";
 
 export default function DailyMatchSection({ matches, groups, selectedDate, onPrevDay, onNextDay }) {
+  const [selectedLineup, setSelectedLineup] = React.useState(null);
+
   const dailyMatches = matches
     .filter((m) => {
       const CRDate = getCostaRicaDateString(m.kickoff_utc);
@@ -74,6 +77,9 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                       src={flagUrl(teamCodes[m.home_team] || "un")}
                       alt={m.home_team}
                       className="daily-flag"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setSelectedLineup({ match: m, teamName: m.home_team })}
+                      title={`Ver alineación de ${m.home_team}`}
                       onError={(e) => {
                         e.target.src = "https://flagcdn.com/w40/un.png";
                       }}
@@ -113,6 +119,9 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
                       src={flagUrl(teamCodes[m.away_team] || "un")}
                       alt={m.away_team}
                       className="daily-flag"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setSelectedLineup({ match: m, teamName: m.away_team })}
+                      title={`Ver alineación de ${m.away_team}`}
                       onError={(e) => {
                         e.target.src = "https://flagcdn.com/w40/un.png";
                       }}
@@ -143,6 +152,14 @@ export default function DailyMatchSection({ matches, groups, selectedDate, onPre
           })
         )}
       </div>
+
+      {selectedLineup && (
+        <LineupModal
+          match={selectedLineup.match}
+          teamName={selectedLineup.teamName}
+          onClose={() => setSelectedLineup(null)}
+        />
+      )}
     </div>
   );
 }
