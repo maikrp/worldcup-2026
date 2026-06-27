@@ -132,17 +132,24 @@ function getGuaranteedQualifiers(groups, matches) {
   });
 }
 
-function MatchBox({ match, isHighlighted }) {
+function MatchBox({ match, isHighlighted, realMatch }) {
+  const t1Score = realMatch?.home_score ?? "—";
+  const t2Score = realMatch?.away_score ?? "—";
+  const status = realMatch?.status;
+
   return (
-    <div className={`bracket-match-box${isHighlighted ? " bracket-match-highlighted" : ""}`}>
-      <div className="bracket-match-id">{match.id}</div>
+    <div className={`bracket-match-box${isHighlighted ? " bracket-match-highlighted" : ""}${status === 'live' ? " bracket-match-live" : ""}`}>
+      <div className="bracket-match-id">
+        {match.id}
+        {status === 'live' && <span className="live-dot-blink" style={{ marginLeft: 6, display: 'inline-block' }}></span>}
+      </div>
       <div className="bracket-team">
-        <span>{match.t1}</span>
-        <strong className="bracket-score">—</strong>
+        <span>{realMatch?.home_team || match.t1}</span>
+        <strong className="bracket-score">{t1Score}</strong>
       </div>
       <div className="bracket-team separator">
-        <span>{match.t2}</span>
-        <strong className="bracket-score">—</strong>
+        <span>{realMatch?.away_team || match.t2}</span>
+        <strong className="bracket-score">{t2Score}</strong>
       </div>
     </div>
   );
@@ -223,9 +230,18 @@ export default function Bracket({ groups = [], matches = [] }) {
                 <span className="round-count">({round.matches.length} partidos)</span>
               </div>
               <div className="bracket-matches">
-                {round.matches.map((match) => (
-                  <MatchBox key={match.id} match={match} isHighlighted={match.id === "M104"} />
-                ))}
+                {round.matches.map((match) => {
+                  const matchNumber = parseInt(match.id.replace("M", ""), 10);
+                  const realMatch = matches.find((m) => m.id === matchNumber);
+                  return (
+                    <MatchBox 
+                      key={match.id} 
+                      match={match} 
+                      realMatch={realMatch} 
+                      isHighlighted={match.id === "M104"} 
+                    />
+                  );
+                })}
               </div>
             </div>
           ))}
