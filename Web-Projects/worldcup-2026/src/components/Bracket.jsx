@@ -239,11 +239,20 @@ export default function Bracket({ groups = [], matches = [] }) {
                 {round.matches.map((match) => {
                   let realMatch = null;
 
-                  // Primero intentamos hacer match por nombre exacto de los equipos involucrados (para los unmatched remotes)
+                  // Primero intentamos hacer match por nombre exacto de los equipos involucrados
                   if (match.team1Base && match.team2Base) {
                     realMatch = matches.find(m => 
                       (m.home_team === match.team1Base && m.away_team === match.team2Base) ||
                       (m.home_team === match.team2Base && m.away_team === match.team1Base)
+                    );
+                  }
+
+                  // Match parcial: Si solo conocemos a un equipo (ej. juega contra un Mejor 3.º) 
+                  // buscamos en los partidos remotos no emparejados (id >= 10000)
+                  if (!realMatch && (match.team1Base || match.team2Base)) {
+                    const knownTeam = match.team1Base || match.team2Base;
+                    realMatch = matches.find(m => 
+                      m.id >= 10000 && (m.home_team === knownTeam || m.away_team === knownTeam)
                     );
                   }
 
