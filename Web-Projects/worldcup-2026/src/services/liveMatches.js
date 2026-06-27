@@ -53,7 +53,7 @@ const TEAM_NAMES = {
   "DR Congo": "Congo RD",
 };
 
-const LIVE_MATCHES_CACHE_KEY = "worldcup-2026:live-matches:v1";
+const LIVE_MATCHES_CACHE_KEY = "worldcup-2026:live-matches:v2";
 const CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
 function parseScore(value) {
