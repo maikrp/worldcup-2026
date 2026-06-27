@@ -17,7 +17,6 @@ export function getEffectiveMatchStatus(match, now = new Date()) {
     return match.status;
   }
 
-  const kickoff = new Date(match.kickoff_utc);
   if (Number.isNaN(kickoff.getTime())) {
     return match.status;
   }
