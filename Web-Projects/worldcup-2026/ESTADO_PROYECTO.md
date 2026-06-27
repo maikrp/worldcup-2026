@@ -58,6 +58,10 @@ tablas, goleadores, pronósticos y llaves.
   segundos para tolerar la latencia real del proveedor.
 - Conservación de los últimos datos válidos cuando una actualización posterior falla.
 - Respaldo local y señal visual diferenciada entre datos en línea, guardados y sin conexión.
+- Integración de la API de ESPN extendida hasta el final del torneo (19 de julio) para capturar los partidos de eliminación directa.
+- Detección y enlace automático de los países clasificados a las llaves (Ronda de 32) usando los nombres normalizados extraídos del API.
+- Los partidos programados en el futuro anulan forzosamente señales "finalizadas" o marcadores "0-0" prematuros enviados por fuentes de datos simuladas.
+- Normalización robusta de nombres de equipos (ej. "Congo DR" a "Congo RD") para evitar fuga de partidos en la asignación de llaves.
 - PWA instalable con manifest, service worker, caché offline e iconos propios.
 - Metadatos Open Graph y Twitter con tarjeta social de 1200 × 630.
 - ESLint 9 y Prettier configurados localmente.
